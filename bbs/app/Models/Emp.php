@@ -15,9 +15,10 @@ class Emp extends Authenticatable
      */
     protected $table = 'emp';
 
+    // use HasFactory, ModelHistoryTrait;
+
     public function role(){
         return $this->belongsTo('App\Models\Role', 'role', 'id');
-        // return $this->belongsTo(Role::class);
     }
 
     public function hasRole(String|int $role) {
@@ -27,4 +28,5 @@ class Emp extends Authenticatable
     public function hasAuthority(String $authority) {
         return (bool) $this->role->authorities->where('name', $authority)->count();
     }
+
 }

@@ -10966,9 +10966,13 @@ $(function () {
                 }
         })
 
-        .done(function() {
-        alert("追加しました");
-        window.location.reload();
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("追加しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
         })
 
         .fail(function(error) {
@@ -11014,19 +11018,24 @@ $(function () {
             }
     })
 
-    .done(function(results) {
-    $("#e1").text(results[0]);
-    $("#e2").text(results[1]);
-    $("#e3").text(results[2]);
-    $("#e4").text(results[3]);
-    $("#e5").text(results[4]);
-    $("#e6").text(results[5]);
-    $("#e7").text(results[6]);
-    $("#e8").text(results[7]);
-    $("#e9").text(results[8]);
+    .done(function(data) {
+        if (!data.alert_message) {
+            $("#e1").text(data[0]);
+            $("#e2").text(data[1]);
+            $("#e3").text(data[2]);
+            $("#e4").text(data[3]);
+            $("#e5").text(data[4]);
+            $("#e6").text(data[5]);
+            $("#e7").text(data[6]);
+            $("#e8").text(data[7]);
+            $("#e9").text(data[8]);
+        } else {
+            alert(data.alert_message);
+        }
+
     })
 
-    .fail(function(error) {
+    .fail(function() {
     // console.log(error.statusText);
     alert("エラーが発生しました");
     });
@@ -11073,12 +11082,16 @@ $(function () {
             }
         })
 
-        .done(function() {
-        alert("更新しました");
-        window.location.reload();
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("更新しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
         })
 
-        .fail(function(error) {
+        .fail(function() {
         alert("エラーが発生しました");
         });
 
@@ -11105,12 +11118,16 @@ $(function () {
         data: {'empno' : empno}
       })
 
-     .done(function() {
+     .done(function(data) {
+        if (!data.alert_message) {
         alert("削除しました");
         window.location.reload();
+        } else {
+        alert(data.alert_message);
+        }
       })
 
-     .fail(function(error) {
+     .fail(function() {
         alert("エラーが発生しました");
     });
 
@@ -11205,7 +11222,7 @@ $(function () {
         // $("#comm3").text(results[2].comm);
         // $("#deptno3").text(results[2].deptno);
         })
-        .fail(function(error) {
+        .fail(function() {
         alert("エラーが発生しました");
         });
     } else {
@@ -11281,7 +11298,7 @@ $(function () {
         //テーブルに作成したhtmlを追加する
         $("#tbl").html(rows);
         })
-        .fail(function(error) {
+        .fail(function() {
         alert("エラーが発生しました");
         });
     } else {
@@ -11314,12 +11331,16 @@ $(function () {
               }
         })
 
-        .done(function(results) {
-        alert("追加しました");
-        window.location.reload();
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("追加しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
         })
 
-        .fail(function(error) {
+        .fail(function() {
         alert("エラーが発生しました");
         });
 
@@ -11351,16 +11372,17 @@ $(function () {
           }
     })
 
-    .done(function(results) {
-    // console.log(results[0]);
-    // console.log(results[1]);
-    // console.log(results[2]);
-    $("#d1").text(results[0]);
-    $("#d2").text(results[1]);
-    $("#d3").text(results[2]);
+    .done(function(data) {
+        if (!data.alert_message) {
+            $("#d1").text(data[0]);
+            $("#d2").text(data[1]);
+            $("#d3").text(data[2]);
+        } else {
+            alert(data.alert_message);
+        }
     })
 
-    .fail(function(error) {
+    .fail(function() {
     alert("エラーが発生しました");
     });
 
@@ -11398,12 +11420,16 @@ $(function () {
             }
         })
 
-        .done(function(results) {
-        alert("更新しました");
-        window.location.reload();
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("更新しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
         })
 
-        .fail(function(error) {
+        .fail(function() {
         alert("エラーが発生しました");
         });
 
@@ -11431,12 +11457,16 @@ $(function () {
         data: {'deptid' : deptid}
       })
 
-     .done(function(results) {
-        alert("削除しました");
-        window.location.reload();
-      })
+     .done(function(data) {
+        if (!data.alert_message) {
+            alert("削除しました");
+            window.location.reload();
+        } else {
+            alert(data.alert_message);
+        }
+  })
 
-     .fail(function(error) {
+     .fail(function() {
         alert("エラーが発生しました");
     });
 
@@ -11487,7 +11517,7 @@ $(function () {
         // $("#tbl").prepend(rows); //前に挿入
 
       })
-     .fail(function(error) {
+     .fail(function() {
         alert("エラーが発生しました");
     });
     } else {
@@ -11530,7 +11560,7 @@ $(function () {
         }
     }
     })
-    .fail(function(error) { //通信エラー
+    .fail(function() { //通信エラー
     document.getElementById('error').innerHTML = "エラーが発生しました";
     // this.csvErrors = error.response.data.errors.csv_file;
     });
@@ -11571,7 +11601,7 @@ $(function () {
         }
     }
     })
-    .fail(function(error) { //通信エラー
+    .fail(function() { //通信エラー
     document.getElementById('error').innerHTML = "エラーが発生しました";
     });
   });
@@ -11601,16 +11631,16 @@ $(function () {
         processData : false,
         dataType    : 'json'
     })
-    .done(function(results) {
+    .done(function(data) {
         // console.log(results);
-    if (results === true) {
-        alert("追加しました"); //成功
-        window.location.reload();
-    } else {
-        $("#img1error").append(results);
-    }
-    })
-    .fail(function(error) { //通信エラー
+        if (data === true) {
+            alert("追加しました"); //成功
+            window.location.reload();
+        } else {
+            $("#img1error").append(data);
+        }
+        })
+    .fail(function() { //通信エラー
     document.getElementById('error').innerHTML = "エラーが発生しました";
     });
   });
@@ -11640,17 +11670,16 @@ $(function () {
         processData : false,
         dataType    : 'json'
     })
-    .done(function(results) {
+    .done(function(data) {
         // console.log(results);
-    if (results === true) {
+    if (data === true) {
         alert("追加しました"); //成功
         window.location.reload();
     } else {
-        // console.log(results);
-        $("#img2error").append(results);
+        $("#img2error").append(data);
     }
     })
-    .fail(function(error) { //通信エラー
+    .fail(function() { //通信エラー
     document.getElementById('error').innerHTML = "エラーが発生しました";
     });
   });
@@ -11674,12 +11703,12 @@ $(function () {
         data: {'empno' : empno}
       })
 
-     .done(function(results) {
+     .done(function(data) {
         alert("削除しました");
         window.location.reload();
-      })
+    })
 
-     .fail(function(error) {
+     .fail(function() {
         alert("エラーが発生しました");
     });
 
@@ -11707,14 +11736,14 @@ $(function () {
         data: {'empno' : empno}
         })
 
-        .done(function(results) {
-        alert("削除しました");
-        window.location.reload();
+        .done(function(data) {
+            alert("削除しました");
+            window.location.reload();
         })
 
-        .fail(function(error) {
+        .fail(function() {
         alert("エラーが発生しました");
-    });
+        });
 
     } else {
         return false;
@@ -11737,12 +11766,76 @@ $(function () {
         data: {'empno' : empno, 'val' : val}
         })
 
-        .done(function(results) {
-        alert("変更しました");
-        window.location.reload();
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("変更しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
+            })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+    });
+  });
+
+
+  $('#rog_display').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var val = document.getElementsByClassName("rog_list")[0].value;
+    var word = $('#word').val();
+
+    // console.log(val);
+    // console.log(word);
+
+        $.ajax({
+        url: '/logserch',
+        type: 'POST',
+        datatype: 'json',
+        data: {'val' : val, 'word' : word}
         })
 
-        .fail(function(error) {
+        .done(function(results) {
+            // console.log(results);
+            var rows = "";
+
+            $.each(results, function(index, value) {
+                rows += "<tr>";
+                rows += "<td>";
+                rows += value.access_time;
+                rows += "</td>";
+                rows += "<td>";
+                rows += value.user_id;
+                rows += "</td>";
+                rows += "<td>";
+                rows += value.ip_address;
+                rows += "</td>";
+                rows += "<td>";
+                rows += value.user_agent;
+                rows += "</td>";
+                rows += "<td>";
+                rows += value.session_id;
+                rows += "</td>";
+                rows += "<td>";
+                rows += value.access_url;
+                rows += "</td>";
+                rows += "<td>";
+                rows += value.operation;
+                rows += "</td>";
+                rows += "</tr>";
+            })
+            // console.log(rows);
+
+            //テーブルに作成したhtmlを追加する
+            $("#loglist").html(rows);
+        })
+
+        .fail(function() {
         alert("エラーが発生しました");
     });
   });

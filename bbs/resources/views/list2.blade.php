@@ -1,15 +1,9 @@
-@extends('layouts.app2')
-
-@section('content')
-{{-- <x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
+            {{ __('部署一覧') }}
         </h2>
-    </x-slot> --}}
-
-<h1>部署一覧</h1>
-<button type="button" onclick=location.href="/dashboard">dashboard</button>
+    </x-slot>
 
 <form action="{{ url('/list2') }}" method="get">
 <table>
@@ -30,7 +24,7 @@
         <input type="submit" name="sortloc" value="▼">
         <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
-        @if(Auth::user()->role === 1)
+        @if(in_array(4, $array))
         <th>編集</th>
         <th>削除</th>
         @endif
@@ -43,7 +37,7 @@
         <td>{{ $depts->deptno }}</td>
         <td>{{ $depts->dname }}</td>
         <td>{{ $depts->loc }}</td>
-        @if(Auth::user()->role === 1)
+        @if(in_array(4, $array))
         <td><button type="button" class="edit2" value="{{ $depts->deptno }}, {{ $depts->dname }}, {{ $depts->loc }}">編集</button></td>
         <td><button type="button" class="delete2" value="{{ $depts->deptno }}">削除</button></td>
         @endif
@@ -52,7 +46,7 @@
 <form action="{{ url('/list2') }}" method="post">
     @csrf
     <tr>
-        @if(Auth::user()->role === 1)
+        @if(in_array(4, $array))
         <td><input type="text" id="insdeptno" name="deptno" value="70" pattern="^[1-9][0-9]$" required></td>
         <td><input type="text" id="insdname" name="dname" value="工事部"  required></td>
         <td><input type="text" id="insloc" name="loc" value="北海道" required></td>
@@ -63,8 +57,8 @@
     </tbody>
 </table>
 </form>
-@if(Auth::user()->role === 1)
-<h3>編集</h3>
+@if(in_array(4, $array))
+<h1>編集</h1>
 <table>
 <tr>
     <th>変更前</th>
@@ -95,7 +89,7 @@
     @csrf
         <input type="submit" id="dep"  value="CSVエクスポート"><input type="button" id="btn3" value="CSVインポート">
 
-    <h3>検索</h3>
+    <h1>検索</h1>
     <table>
         <thead></thead>
         <tbody>
@@ -108,7 +102,7 @@
         </tr>
         </tbody>
     </table>
-<h4>検索結果</h4>
+<h2>検索結果</h2>
 
 <table width="400" id="tbl">
 </table>
@@ -125,5 +119,4 @@
     </form>
 </div>
 
-@endsection
-{{-- </x-app-layout> --}}
+</x-app-layout>

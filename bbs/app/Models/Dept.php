@@ -13,4 +13,5 @@ class Dept extends Model
      * @var string
      */
     protected $table = 'dept';
+
 }

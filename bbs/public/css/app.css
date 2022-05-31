@@ -9,8 +9,6 @@
 ::before,
 ::after {
   box-sizing: border-box; /* 1 */
-  border-width: 0; /* 2 */
-  border-style: solid; /* 2 */
   border-color: #e5e7eb; /* 2 */
 }
 
@@ -1426,3 +1424,42 @@ select {
   }
 }
 
+.num {
+    width: 5em;
+}
+
+.pagination  {
+    text-align: center;
+}
+
+.pagination li{
+    display: inline-block;
+}
+
+table {
+    table-layout: fixed;
+}
+
+th {
+    white-space: nowrap;
+    text-align: center;
+    border-style: groove;
+}
+
+td {
+    text-align: center;
+    width: 80;
+    border-style: groove;
+}
+
+#dispnum {
+    width: 4em;
+}
+
+.originalhidden {
+    display: none;
+}
+
+input.resize{
+    width:150px;
+    }

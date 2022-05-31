@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Emp;
-use App\Models\Dept;
-use App\Models\Role;
+use Illuminate\Support\Arr;
 
 class TestController extends Controller
 {
@@ -77,104 +75,162 @@ class TestController extends Controller
 
     public function list1(Request $req)
     {
-        $dispnum = 5;
-        $sort = 'asc';
-
-        if (!$req->category) {
-            $category = 'id';
-        } else {
-            $category = $req->category;
-        }
-
-
-        if ($req->sortid) {
-            $sort = $req->sortid;
-            $category = 'id';
-        }
-        if ($req->sortempno) {
-            $sort = $req->sortempno;
-            $category = 'empno';
-        }
-        if ($req->sortename) {
-            $sort = $req->sortename;
-            $category = 'ename';
-        }
-        if ($req->sortjob) {
-            $sort = $req->sortjob;
-            $category = 'job';
-        }
-        if ($req->sortmgr) {
-            $sort = $req->sortmgr;
-            $category = 'mgr';
-        }
-        if ($req->sorthiredate) {
-            $sort = $req->sorthiredate;
-            $category = 'hiredate';
-        }
-        if ($req->sortsal) {
-            $sort = $req->sortsal;
-            $category = 'sal';
-        }
-        if ($req->sortcomm) {
-            $sort = $req->sortcomm;
-            $category = 'comm';
-        }
-        if ($req->sortdeptno) {
-            $sort = $req->sortdeptno;
-            $category = 'deptno';
-        }
-
-
-        if ($sort === '▼') {
-            $sort = 'desc';
-            if ($req->dispnum) {
-                $dispnum = $req->dispnum;
-            }
-        } else {
+        //ログインユーザーのid取得
+        $user = Auth::user()->id;
+        //ログインユーザーの役割と権限を取得
+        $role_data = DB::table('emp')
+            ->select('authority_id', 'roles.name')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+        //多次元配列になったstdClassをArrayにキャスト
+        $encode = json_decode(json_encode($role_data), true);
+        //多次元配列を一次元配列に変換
+        $array = Arr::flatten($encode);
+        //ログインユーザーの役割のみ取得
+        $roles_name = $encode[0]['name'];
+        //一次元配列の中に特定の値(1:顧客閲覧)があるか判定
+        if (in_array(1, $array)) {
+            $dispnum = 5;
             $sort = 'asc';
-            if ($req->dispnum) {
-                $dispnum = $req->dispnum;
+
+            if (!$req->category) {
+                $category = 'id';
+            } else {
+                $category = $req->category;
             }
+
+
+            if ($req->sortid) {
+                $sort = $req->sortid;
+                $category = 'id';
+            }
+            if ($req->sortempno) {
+                $sort = $req->sortempno;
+                $category = 'empno';
+            }
+            if ($req->sortename) {
+                $sort = $req->sortename;
+                $category = 'ename';
+            }
+            if ($req->sortjob) {
+                $sort = $req->sortjob;
+                $category = 'job';
+            }
+            if ($req->sortmgr) {
+                $sort = $req->sortmgr;
+                $category = 'mgr';
+            }
+            if ($req->sorthiredate) {
+                $sort = $req->sorthiredate;
+                $category = 'hiredate';
+            }
+            if ($req->sortsal) {
+                $sort = $req->sortsal;
+                $category = 'sal';
+            }
+            if ($req->sortcomm) {
+                $sort = $req->sortcomm;
+                $category = 'comm';
+            }
+            if ($req->sortdeptno) {
+                $sort = $req->sortdeptno;
+                $category = 'deptno';
+            }
+
+
+            if ($sort === '▼') {
+                $sort = 'desc';
+                if ($req->dispnum) {
+                    $dispnum = $req->dispnum;
+                }
+            } else if($sort === '▲') {
+                $sort = 'asc';
+                if ($req->dispnum) {
+                    $dispnum = $req->dispnum;
+                }
+            }
+
+            if ($req->sorton) {
+                $sort = $req->sorton;
+            }
+
+            // print_r($dispnum);
+            // print_r($sort);
+            // print_r($category);
+
+            // $members = DB::table('emp')->orderby($category, $sort)->paginate($dispnum);
+
+            $members = DB::table('emp')
+            ->select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->orderby($category, $sort)->paginate($dispnum);
+
+            $data = ['members' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array, 'roles_name' => $roles_name];
+            // // print_r($data);
+            return view('list1', $data);
+
+        } else {
+            return view('dashboard');
         }
-
-        if ($req->sorton) {
-            $sort = $req->sorton;
-        }
-
-        // print_r($dispnum);
-        // print_r($sort);
-        // print_r($category);
-
-        $members = DB::table('emp')->orderby($category, $sort)->paginate($dispnum);
-        $data = ['members' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category];
-        // print_r($data);
-        return view('list1', $data);
     }
 
     public function edit1(Request $req)
     {
-        $editdata = DB::table('emp')->where('id', $req->edid)->update([
-            'id' => $req->ed1,
-            'empno' => $req->ed2,
-            'ename' => $req->ed3,
-            'job' => $req->ed4,
-            'mgr' => $req->ed5,
-            'hiredate' => $req->ed6,
-            'sal' => $req->ed7,
-            'comm' => $req->ed8,
-            'deptno' => $req->ed9
-        ]);
-        // $data = ['title' => '編集', 'members' => $members];
-        // print_r($data);
-        return response()->json($editdata);
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(2, $array)) {
+            $editdata = DB::table('emp')->where('id', $req->edid)->update([
+                'id' => $req->ed1,
+                'empno' => $req->ed2,
+                'ename' => $req->ed3,
+                'job' => $req->ed4,
+                'mgr' => $req->ed5,
+                'hiredate' => $req->ed6,
+                'sal' => $req->ed7,
+                'comm' => $req->ed8,
+                'deptno' => $req->ed9
+            ]);
+            // $data = ['title' => '編集', 'members' => $members];
+            // print_r($data);
+            return response()->json($editdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
     public function editcheck1(Request $req)
     {
-        $editlist = array($req->editid, $req->editempno, $req->editename, $req->editjob, $req->editmgr, $req->edithiredate, $req->editsal, $req->editcomm, $req->editdeptno);
+        $user = Auth::user()->id;
 
-        $editcheckdata = $editlist;
-        return response()->json($editcheckdata);
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(2, $array)) {
+            $editlist = array($req->editid, $req->editempno, $req->editename, $req->editjob, $req->editmgr, $req->edithiredate, $req->editsal, $req->editcomm, $req->editdeptno);
+
+            $editcheckdata = $editlist;
+            return response()->json($editcheckdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
     public function edit1_2(Request $req)
@@ -207,30 +263,46 @@ class TestController extends Controller
 
     public function insert1(Request $req)
     {
-        $user_id = $req->insid;
-        $empno = $req->insempno;
-        $ename = $req->insename;
-        $job = $req->insjob;
-        $mgr = $req->insmgr;
-        $hiredate = $req->inshiredate;
-        $sal = $req->inssal;
-        $comm = $req->inscomm;
-        $deptno = $req->insdeptno;
+        $user = Auth::user()->id;
 
-        $insertdata = DB::table('emp')->insert([
-                        'id' => $user_id,
-                        'empno' => $empno,
-                        'ename' => $ename,
-                        'job' => $job,
-                        'mgr' => $mgr,
-                        'hiredate' => $hiredate,
-                        'sal' => $sal,
-                        'comm' => $comm,
-                        'deptno' => $deptno
-                      ]);
-        // $data = ['title' => '追加確認', 'members' => $members];
-        // print_r($data);
-        return response()->json($insertdata);
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(2, $array)) {
+            $user_id = $req->insid;
+            $empno = $req->insempno;
+            $ename = $req->insename;
+            $job = $req->insjob;
+            $mgr = $req->insmgr;
+            $hiredate = $req->inshiredate;
+            $sal = $req->inssal;
+            $comm = $req->inscomm;
+            $deptno = $req->insdeptno;
+
+            $insertdata = DB::table('emp')->insert([
+                            'id' => $user_id,
+                            'empno' => $empno,
+                            'ename' => $ename,
+                            'job' => $job,
+                            'mgr' => $mgr,
+                            'hiredate' => $hiredate,
+                            'sal' => $sal,
+                            'comm' => $comm,
+                            'deptno' => $deptno,
+                        ]);
+            // $data = ['title' => '追加確認', 'members' => $members];
+            // print_r($data);
+            return response()->json($insertdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
 
@@ -263,10 +335,26 @@ class TestController extends Controller
 
     public function delete1(Request $req)
     {
-        $deletedata = DB::table('emp')->where('empno', $req->empno)->delete();
-        // $data = ['title' => '削除確認', 'members' => $members];
-        // print_r($data);
-        return response()->json($deletedata);
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(2, $array)) {
+            $deletedata = DB::table('emp')->where('empno', $req->empno)->delete();
+            // $data = ['title' => '削除確認', 'members' => $members];
+            // print_r($data);
+            return response()->json($deletedata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
     public function delete1_2(Request $req)
@@ -280,74 +368,122 @@ class TestController extends Controller
 
     public function list2(Request $req)
     {
-        $dispnum = 3;
-        $sort = 'asc';
+        $user = Auth::user()->id;
 
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
 
-        if (!$req->category) {
-            $category = 'deptno';
-        } else {
-            $category = $req->category;
-        }
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
 
-
-        if ($req->sortdeptno) {
-            $sort = $req->sortdeptno;
-            $category = 'deptno';
-        }
-        if ($req->sortdname) {
-            $sort = $req->sortdname;
-            $category = 'dname';
-        }
-        if ($req->sortloc) {
-            $sort = $req->sortloc;
-            $category = 'loc';
-        }
-
-
-        if ($sort === '▼') {
-            $sort = 'desc';
-            if ($req->dispnum) {
-                $dispnum = $req->dispnum;
-            }
-        } else {
+        if (in_array(3, $array)) {
+            $dispnum = 3;
             $sort = 'asc';
-            if ($req->dispnum) {
-                $dispnum = $req->dispnum;
+
+
+            if (!$req->category) {
+                $category = 'deptno';
+            } else {
+                $category = $req->category;
             }
+
+
+            if ($req->sortdeptno) {
+                $sort = $req->sortdeptno;
+                $category = 'deptno';
+            }
+            if ($req->sortdname) {
+                $sort = $req->sortdname;
+                $category = 'dname';
+            }
+            if ($req->sortloc) {
+                $sort = $req->sortloc;
+                $category = 'loc';
+            }
+
+
+            if ($sort === '▼') {
+                $sort = 'desc';
+                if ($req->dispnum) {
+                    $dispnum = $req->dispnum;
+                }
+            } else {
+                $sort = 'asc';
+                if ($req->dispnum) {
+                    $dispnum = $req->dispnum;
+                }
+            }
+
+            if ($req->sorton) {
+                $sort = $req->sorton;
+            }
+
+            // print_r($dispnum);
+            // print_r($sort);
+            // print_r($category);
+
+            $members = DB::table('dept')->orderby($category, $sort)->paginate($dispnum);
+            $data = ['depte' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array];
+            // print_r($data);
+            return view('list2', $data);
+
+        } else {
+            return view('dashboard');
         }
-
-        if ($req->sorton) {
-            $sort = $req->sorton;
-        }
-
-        // print_r($dispnum);
-        // print_r($sort);
-        // print_r($category);
-
-        $members = DB::table('dept')->orderby($category, $sort)->paginate($dispnum);
-        $data = ['depte' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category];
-        // print_r($data);
-        return view('list2', $data);
     }
 
     public function edit2(Request $req)
     {
-        $editdata = DB::table('dept')->where('deptno', $req->edid)->update([
-                    'deptno' => $req->ed1,
-                    'dname' => $req->ed2,
-                    'loc' => $req->ed3,
-                   ]);
-        // $data = ['title' => '編集', 'dept' => $members];
-        return response()->json($editdata);
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(4, $array)) {
+            $editdata = DB::table('dept')->where('deptno', $req->edid)->update([
+                        'deptno' => $req->ed1,
+                        'dname' => $req->ed2,
+                        'loc' => $req->ed3,
+                    ]);
+            // $data = ['title' => '編集', 'dept' => $members];
+            return response()->json($editdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
     public function editcheck2(Request $req)
     {
-        $editlist = array($req->editdeptno, $req->editdname, $req->editloc);
+        $user = Auth::user()->id;
 
-        $editcheckdata = $editlist;
-        return response()->json($editcheckdata);
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(4, $array)) {
+            $editlist = array($req->editdeptno, $req->editdname, $req->editloc);
+
+            $editcheckdata = $editlist;
+            return response()->json($editcheckdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
     public function edit2_2(Request $req)
@@ -368,20 +504,36 @@ class TestController extends Controller
 
     public function insert2(Request $req)
     {
-        $deptno = $req->insdeptno;
-        $dname = $req->insdname;
-        $loc = $req->insloc;
+        $user = Auth::user()->id;
 
-        $insertdata = DB::table('dept')->insert([
-                        'deptno' => $deptno,
-                        'dname' => $dname,
-                        'loc' => $loc,
-                      ]);
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
 
-        // $members = array($deptno, $dname, $loc);
-        // $data = ['title' => '追加確認', 'dept' => $members];
-        // print_r($data);
-        return response()->json($insertdata);
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(4, $array)) {
+            $deptno = $req->insdeptno;
+            $dname = $req->insdname;
+            $loc = $req->insloc;
+
+            $insertdata = DB::table('dept')->insert([
+                            'deptno' => $deptno,
+                            'dname' => $dname,
+                            'loc' => $loc,
+                        ]);
+
+            // $members = array($deptno, $dname, $loc);
+            // $data = ['title' => '追加確認', 'dept' => $members];
+            // print_r($data);
+            return response()->json($insertdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
 
@@ -402,9 +554,25 @@ class TestController extends Controller
 
     public function delete2(Request $req)
     {
-        $deletedata = DB::table('dept')->where('deptno', $req->deptid)->delete();
-        // $data = ['title' => '部署一覧', 'members' => $members];
-        return response()->json($deletedata);
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(4, $array)) {
+            $deletedata = DB::table('dept')->where('deptno', $req->deptid)->delete();
+            // $data = ['title' => '部署一覧', 'members' => $members];
+            return response()->json($deletedata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
 
     public function delete2_2(Request $req)
@@ -1087,7 +1255,6 @@ class TestController extends Controller
 
     public function tuikaimg2(Request $req)
     {
-
         //選択したファイルの拡張子だけを取得
         $ext = pathinfo($_FILES["simg2"]["name"], PATHINFO_EXTENSION);
 
@@ -1134,20 +1301,227 @@ class TestController extends Controller
 
     public function role_change(Request $req)
     {
-        $change = DB::table('emp')->where('empno', $req->empno)->update(['role' => $req->val]);
-        return response()->json($change);
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(2, $array)) {
+            $change = DB::table('emp')->where('empno', $req->empno)->update(['role' => $req->val]);
+            return response()->json($change);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
     }
+
+    public function log(Request $req)
+    {
+        $dispnum = 10;
+        $sort = 'desc';
+
+        if (!$req->category) {
+            $category = 'access_time';
+        } else {
+            $category = $req->category;
+        }
+
+
+        if ($req->sortaccess_time) {
+            $sort = $req->sortaccess_time;
+            $category = 'access_time';
+        }
+        if ($req->sortid) {
+            $sort = $req->sortid;
+            $category = 'user_id';
+        }
+        if ($req->sortip) {
+            $sort = $req->sortip;
+            $category = 'ip_address';
+        }
+        if ($req->sortagent) {
+            $sort = $req->sortagent;
+            $category = 'user_agent';
+        }
+        if ($req->sortsession) {
+            $sort = $req->sortsession;
+            $category = 'session_id';
+        }
+        if ($req->sorturl) {
+            $sort = $req->sorturl;
+            $category = 'access_url';
+        }
+        if ($req->sortoperation) {
+            $sort = $req->sortoperation;
+            $category = 'operation';
+        }
+
+
+        if ($sort === '▼') {
+            $sort = 'desc';
+            if ($req->dispnum) {
+                $dispnum = $req->dispnum;
+            }
+        } else if ($sort === '▲') {
+            $sort = 'asc';
+            if ($req->dispnum) {
+                $dispnum = $req->dispnum;
+            }
+        }
+
+        if ($req->sorton) {
+            $sort = $req->sorton;
+        }
+
+        $logger = DB::table('user_logs')
+        ->select('user_id', 'ip_address', 'user_agent', 'session_id', 'access_url', 'operation', 'access_time')
+        ->orderby($category, $sort)->paginate($dispnum);
+
+        $data = ['logger' => $logger, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category];
+        // print_r($data);
+        return view('log', $data);
+
+    }
+
+    public function logserch(Request $req)
+    {
+        $searchlog = DB::table('user_logs')->select(
+            'user_id', 'ip_address', 'user_agent', 'session_id',
+            'access_url', 'operation', 'access_time')
+            ->where($req->val, 'like', "%$req->word%")->orderby('access_time', 'desc')->get();
+        return response()->json($searchlog);
+    }
+
+    public function logcsvd(Request $req) {
+
+        // if($word) {
+        //     return response()->streamDownload(
+        //         function () use($val, $word) {
+        //             // 出力バッファをopen
+        //             $stream = fopen('php://output', 'w');
+        //             // 文字コードをShift-JISに変換
+        //             stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
+
+        //         // ヘッダー
+        //         fputcsv($stream, [
+        //             'access_time',
+        //             'user_id',
+        //             'ip_address',
+        //             'user_agent',
+        //             'session_id',
+        //             'access_url',
+        //             'operation',
+        //         ]);
+        //         // データ
+        //         $csv =DB::table('user_logs')->select('*')->where($val, 'like', '%'.$word.'%')->get();
+        //         foreach ($csv as $log) {
+        //             fputcsv($stream, [
+        //                 $log->access_time,
+        //                 $log->user_id,
+        //                 $log->ip_address,
+        //                 $log->user_agent,
+        //                 $log->session_id,
+        //                 $log->access_url,
+        //                 $log->operation,
+        //             ]);
+        //         }
+        //         fclose($stream);
+        //         },
+        //         'log.csv',
+        //         [
+        //             'Content-Type' => 'application/octet-stream',
+        //         ]
+        //     );
+        // } else {
+            return response()->streamDownload(
+                function () {
+                    // 出力バッファをopen
+                    $stream = fopen('php://output', 'w');
+                    // 文字コードをShift-JISに変換
+                    stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
+
+                    // ヘッダー
+                    fputcsv($stream, [
+                        'access_time',
+                        'user_id',
+                        'ip_address',
+                        'user_agent',
+                        'session_id',
+                        'access_url',
+                        'operation',
+                    ]);
+                    // データ
+                    $csv =DB::table('user_logs')->get();
+                    foreach ($csv as $log) {
+                        fputcsv($stream, [
+                            $log->access_time,
+                            $log->user_id,
+                            $log->ip_address,
+                            $log->user_agent,
+                            $log->session_id,
+                            $log->access_url,
+                            $log->operation,
+                        ]);
+                    }
+                    fclose($stream);
+                },
+                'log.csv',
+                [
+                    'Content-Type' => 'application/octet-stream',
+                ]
+            );
+        // }
+    }
+
+
 
     public function aaa(Request $req)
     {
-        $a = Emp::with('role')->find(Auth::user()->id)->toArray();
-        $d = $a['role']['name'];
-        print_r($d);
-        dd( $d );
+        //passwordをhash化
+        // $pass = DB::table('emp')
+        //     ->select('password')
+        //     ->where('empno', 2001)->get();
 
-        // $favorites = Emp::with('role')->with(['authority_role' => function ($query) {
-        //     $query->with('authorities');
-        // }])->find(Auth::user()->id);
-        // dd( $favorites );
+        //     foreach ($pass as $pas) {
+        //     }
+        // $rrr = $pas->password;
+
+        // $hashpass = password_hash($rrr, PASSWORD_DEFAULT);
+
+        // DB::table('emp')->where('empno', 2001)->update([
+        //     'password' => $hashpass,
+        // ]);
+
+
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id', 'roles.name')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+        // $ketu_role = $encode[0]['authority_id'];
+        // $khen_role = $encode[1]['authority_id'];
+        // $betu_role = $encode[2]['authority_id'];
+        // $bhen_role = $encode[3]['authority_id'];
+        // $role_name = $encode[0]['name'];
+
+        // print_r($ketu_role."\n");
+        // print_r($khen_role."\n");
+        // print_r($betu_role."\n");
+        // print_r($bhen_role."\n");
+        // print_r($role_name);
+         echo($array);
+        // dd( $array );
+        // dd( $ar );
     }
 }

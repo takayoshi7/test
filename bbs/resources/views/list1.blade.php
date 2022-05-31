@@ -1,15 +1,9 @@
-@extends('layouts.app2')
-
-@section('content')
-{{-- <x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
+            {{ __('社員一覧') }}
         </h2>
-    </x-slot> --}}
-
-<h1>社員一覧</h1>
-<button type="button" onclick=location.href="/dashboard">dashboard</button>
+    </x-slot>
 
 <form action="{{ url('/list1') }}" method="get">
 <table class="list1">
@@ -64,9 +58,11 @@
         </th>
         <th width="100">画像2
         </th>
-        @if(Auth::user()->role === 1 || Auth::user()->role === 3)
+        @if(in_array(2, $array))
         <th>編集</th>
         <th>削除</th>
+        @endif
+        @if($roles_name === '管理者')
         <th>役割</th>
         @endif
     </tr>
@@ -88,12 +84,12 @@
             @if (!is_null($member->img1))
                 {{-- data:image/png;base64,をつけてあげることによって、base64でエンコードされた画像を表示するという記法になる --}}
                 <img src="data:image/png;base64,{{ $member->img1 }}" width="30px">
-                @if(Auth::user()->empno === $member->empno || Auth::user()->role === 1 || Auth::user()->role === 3)
+                @if(in_array(2, $array))
                 <button type="button" class="img1" onclick="img1func({{ $member->empno }})">変更</button>
                 @endif
             @else
                 <img src="{{ \Storage::url('img/no_image.jpg') }}" width="30px">
-                @if(Auth::user()->empno === $member->empno || Auth::user()->role === 1 || Auth::user()->role === 3)
+                @if(in_array(2, $array))
                 <button type="button" class="img1" onclick="img1func({{ $member->empno }})">変更</button>
                 @endif
             @endif
@@ -101,22 +97,22 @@
         <td>
             @if (!is_null($member->img2))
                 <img src="{{ \Storage::url('img/'.$member->img2) }}" width="30px">
-                @if(Auth::user()->empno === $member->empno || Auth::user()->role === 1 || Auth::user()->role === 3)
+                @if(in_array(2, $array))
                 <button type="button" class="img2" onclick="img2func({{ $member->empno }})">変更</button>
                 @endif
             @else
                 <img src="{{ \Storage::url('img/no_image.jpg') }}" width="30px">
-                @if(Auth::user()->empno === $member->empno || Auth::user()->role === 1 || Auth::user()->role === 3)
+                @if(in_array(2, $array))
                 <button type="button" class="img2" onclick="img2func({{ $member->empno }})">変更</button>
                 @endif
             @endif
         </td>
-        @if(Auth::user()->role === 1 || Auth::user()->role === 3)
+        @if(in_array(2, $array))
         <td><button type="button" class="edit1" value="{{ $member->id }}, {{ $member->empno }}, {{ $member->ename }}, {{ $member->job }}, {{ $member->mgr }}, {{ $member->hiredate }}, {{ $member->sal }}, {{ $member->comm }}, {{ $member->deptno }}">編集</button></td>
         <td><button type="button" class="delete1" value="{{ $member->empno }}">削除</button></td>
         @endif
-        @if(Auth::user()->role === 1)
-        <td>{{ $member->role }}
+        @if($roles_name === '管理者')
+        <td>{{ $member->name }}<br>
             <button type="button"  class="role1" onclick="roleselect({{ $member->empno }})">変更</button>
         </td>
         @endif
@@ -125,25 +121,26 @@
     <form action="{{ url('/list1') }}" method="post">
     @csrf
     <tr>
-        @if(Auth::user()->role === 1 || Auth::user()->role === 3)
-        <td><input type="text" id="insid" name="user_id" value="6001itou" pattern="^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$" required></td>
-        <td><input type="text" id="insempno" name="empno" value="5555" pattern="^([1-9][0-9]{3})" required></td>
+        @if(in_array(2, $array))
+        <td><input type="text" class="resize" id="insid" name="user_id" value="6001itou" pattern="^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$" required></td>
+        <td><input type="text" class="resize" id="insempno" name="empno" value="5555" pattern="^([1-9][0-9]{3})" required></td>
         <td><input type="text" id="insename" name="ename" value="伊藤太郎"  required></td>
-        <td><input type="text" id="insjob" name="job" value="工事" required></td>
-        <td><input type="text" id="insmgr" name="mgr" value="8888" pattern="^([1-9][0-9]{3})"></td>
-        <td><input type="datetime" id="inshiredate" name="hiredate" value="2000-10-10" pattern="\d{4}-\d{2}-\d{2}" required></td>
-        <td><input type="text" id="inssal" name="sal" value="800" pattern="^[1-9][0-9]*"></td>
-        <td><input type="text" id="inscomm" name="comm" value="200" pattern="^[1-9][0-9]*"></td>
-        <td><input type="text" id="insdeptno" name="deptno" value="50" pattern="^[1-9][0-9]$" required></td>
-        <td colspan="2"><input type="submit" id="insert1btn" value="追加"></td>
+        <td><input type="text" class="resize" id="insjob" name="job" value="工事" required></td>
+        <td><input type="text" class="resize" id="insmgr" name="mgr" value="8888" pattern="^([1-9][0-9]{3})"></td>
+        <td><input type="text" id="inshiredate" name="hiredate" value="2000-10-10" pattern="\d{4}-\d{2}-\d{2}" required></td>
+        <td><input type="text" class="resize" id="inssal" name="sal" value="800" pattern="^[1-9][0-9]*"></td>
+        <td><input type="text" class="resize" id="inscomm" name="comm" value="200" pattern="^[1-9][0-9]*"></td>
+        <td><input type="text" class="resize" id="insdeptno" name="deptno" value="50" pattern="^[1-9][0-9]$" required></td>
+        <td colspan="2"><input type="submit" id="insert1btn" value="社員追加"></td>
         <td colspan="2"><input type="reset" value="リセット"></td>
         @endif
     </tr>
     </tbody>
 </table>
 </form>
-@if(Auth::user()->role === 1 || Auth::user()->role === 3)
-<h3>編集</h3>
+<br>
+@if(in_array(2, $array))
+<h1>編集</h1>
 <table>
 <tr>
     <th>変更前</th>
@@ -160,15 +157,15 @@
 </tr>
 <tr>
     <th>変更後</th>
-    <td><input type="text" id="ee1" value="8080itou" pattern="^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$" required></td>
-    <td><input type="text" id="ee2" value="8080" pattern="^([1-9][0-9]{3})" required></td>
+    <td><input type="text" class="resize" id="ee1" value="8080itou" pattern="^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$" required></td>
+    <td><input type="text" class="resize" id="ee2" value="8080" pattern="^([1-9][0-9]{3})" required></td>
     <td><input type="text" id="ee3" value="伊藤次郎"  required></td>
-    <td><input type="text" id="ee4" value="工事" required></td>
-    <td><input type="text" id="ee5" value="8888" pattern="^([1-9][0-9]{3})"></td>
-    <td><input type="datetime" id="ee6" value="2005-10-10" pattern="\d{4}-\d{1,2}-\d{1,2}" required></td>
-    <td><input type="text" id="ee7" value="1200" pattern="^[1-9][0-9]*"></td>
-    <td><input type="text" id="ee8" value="200" pattern="^[1-9][0-9]*"></td>
-    <td><input type="text" id="ee9" value="50" pattern="^[1-9][0-9]$" required></td>
+    <td><input type="text" class="resize" id="ee4" value="工事" required></td>
+    <td><input type="text" class="resize" id="ee5" value="8888" pattern="^([1-9][0-9]{3})"></td>
+    <td><input type="text" id="ee6" value="2005-10-10" pattern="\d{4}-\d{1,2}-\d{1,2}" required></td>
+    <td><input type="text" class="resize" id="ee7" value="1200" pattern="^[1-9][0-9]*"></td>
+    <td><input type="text" class="resize" id="ee8" value="200" pattern="^[1-9][0-9]*"></td>
+    <td><input type="text" class="resize" id="ee9" value="50" pattern="^[1-9][0-9]$" required></td>
     <td><input type="submit" id="edit1btn" value="更新"></td>
 </tr>
 </table>
@@ -186,7 +183,7 @@
     @csrf
         <input type="submit" id="em"  value="CSVエクスポート"><input type="button" id="btn2" value="CSVインポート">
 
-    <h3>検索</h3>
+    <h1>検索</h1>
     <table>
         <thead></thead>
         <tbody>
@@ -206,7 +203,7 @@
 </table>
 </form>
 
-<h4>検索結果</h4>
+<h2>検索結果</h2>
 
 <table width="1200" id="tbl">
 </table>
@@ -256,11 +253,10 @@
         @endforeach
     </select>
     <br><br>
-    <button type="button" id="role_change">アップロード</button>
+    <button type="button" id="role_change">変更</button>
     <br>
     <div id="roleerror"></div>
     </form>
 </div>
 
-@endsection
-{{-- </x-app-layout> --}}
+</x-app-layout>

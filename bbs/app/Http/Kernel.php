@@ -63,6 +63,13 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'Authority' => \App\Http\Middleware\AuthorityMiddleware::class,
+        'insert' => \App\Http\Middleware\InsertLog::class,
+        'edit' => \App\Http\Middleware\EditLog::class,
+        'delete' => \App\Http\Middleware\DeleteLog::class,
+        'imgup' => \App\Http\Middleware\ImgupLog::class,
+        'imgdelete' => \App\Http\Middleware\ImgdeleteLog::class,
+        'csvup' => \App\Http\Middleware\CsvupLog::class,
+        'csvdown' => \App\Http\Middleware\CsvdownLog::class,
+        'rolechange' => \App\Http\Middleware\RolechangeLog::class,
     ];
 }
