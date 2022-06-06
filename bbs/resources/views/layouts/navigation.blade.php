@@ -31,6 +31,13 @@
                         {{ __('ログ一覧') }}
                     </x-nav-link>
                 </div>
+                {{-- @if(in_array(5, $array)) --}}
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('schedule')" :active="request()->routeIs('schedule')">
+                        {{ __('スケジュール設定') }}
+                    </x-nav-link>
+                </div>
+                {{-- @endif --}}
             </div>
 
             <!-- Settings Dropdown -->

@@ -8,5 +8,6 @@ return [
     'session_id' => 'セッションID',
     'access_url' => 'アクセスURL',
     'operation' => '実行操作',
+    'access_time' => 'アクセスタイム',
   ]
 ];

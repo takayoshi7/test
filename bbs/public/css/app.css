@@ -1462,4 +1462,31 @@ td {
 
 input.resize{
     width:150px;
-    }
+}
+
+input.resize2{
+    width:104px;
+}
+
+.popup {
+    display: none;
+    height: 100vh;
+    width: 100%;
+    background: black;
+    opacity: 0.9;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.content{
+    background: rgb(197, 244, 190);
+    padding: 30px;
+    width: 50%;
+}
+
+.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

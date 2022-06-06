@@ -5,6 +5,9 @@ use App\Models\Emp;
 use App\Models\Dept;
 use App\Models\Role;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,10 +29,16 @@ Route::get('/dashboard', function () {
 
 require __DIR__.'/auth.php';
 
+Route::get('/test', function () {
+    Mail::to('test@example.com', 'Test')->send(new TestMail);
+    return 'メール送信しました！';
+});
+
 
 //基本の書き方 laravel9版
 use App\Http\Controllers\TestController;
     Route::controller(TestController::class)->group(function () {
+    // Route::get('/dashboard', 'dashboard')->middleware(['auth'])->name('dashboard');
     Route::get('/list1', 'list1')->name('list1');
     Route::post('/list1', 'list1')->name('list1');
     Route::get('/list2', 'list2')->name('list2');
@@ -57,8 +66,14 @@ use App\Http\Controllers\TestController;
     Route::get('/log', 'log')->name('log');
     Route::post('/logserch', 'logserch');
     Route::post('/logcsvd', 'logcsvd');
-
+    Route::get('/schedule', 'schedule')->name('schedule');
+    Route::post('/schedule', 'schedule')->name('schedule');
+    Route::post('/setting1', 'setting1');
+    Route::post('/setting2', 'setting2');
+    Route::post('/setting3', 'setting3');
+    Route::get('/mail', 'send');
 
     Route::get('/aaa', 'aaa')->name('aaa');
     Route::post('/aaa', 'aaa')->name('aaa');
 });
+

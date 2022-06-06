@@ -258,5 +258,93 @@
     <div id="roleerror"></div>
     </form>
 </div>
+<script type="text/javascript">
+    $(function() {
+        // 入力ダイアログを表示
+        $("#btn2").click(function() {
 
+        //ダイアログを開くたびに表示を初期化
+        $('#csv_file').val("");
+        $('#error').html("");
+
+        $("#app2").dialog("open");
+        return false;
+        });
+
+        // 入力ダイアログを定義
+        $("#app2").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"CSVファイルインポート",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+
+    function img1func(empno) {
+        $('#simg1').val("");
+        $('#img1error').html("");
+        $('#dialog_empno').val(empno);
+
+        $("#select_img1").dialog("open");
+    }
+
+    $(function() {
+        $("#select_img1").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"画像選択",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+
+    function img2func(empno) {
+        $('#simg2').val("");
+        $('#img2error').html("");
+        $('#dialog_empno').val(empno);
+
+        $("#select_img2").dialog("open");
+    }
+
+    $(function() {
+        $("#select_img2").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"画像選択",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+
+    function roleselect(empno) {
+    $('#tag-id').val("");
+    $('#roleerror').html("");
+    $('#dialog_empno').val(empno);
+
+    $("#role_edit").dialog("open");
+    }
+
+    $(function() {
+        $("#role_edit").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"役割選択",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+</script>
 </x-app-layout>

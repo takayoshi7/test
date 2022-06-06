@@ -31,7 +31,7 @@
     </tr>
     </thead>
 </form>
-    <tbody>
+    <tbody id="deptlist">
     @foreach ($depte as $depts) {{--Controllerから渡された$dataのDEPT(DBのデータが入っている)をasを使いDEPTSに変えた--}}
     <tr>
         <td>{{ $depts->deptno }}</td>
@@ -118,5 +118,29 @@
     <div id="error"></div>
     </form>
 </div>
+<script type="text/javascript">
+    $(function() {
+        // 入力ダイアログを表示
+        $("#btn3").click(function() {
 
+        $('#csv_file').val("");
+        $('#error').html("");
+
+        $("#app").dialog("open");
+        return false;
+        });
+
+        // 入力ダイアログを定義
+        $("#app").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"CSVファイルインポート",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+</script>
 </x-app-layout>

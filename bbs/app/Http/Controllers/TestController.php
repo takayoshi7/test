@@ -9,69 +9,29 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 
 class TestController extends Controller
 {
 
-    public function mypage(Request $req)
-    {
-        //postされて来なかったとき　×
-        if (count($_POST) === 0) {
-            echo "ログインしてください";
-            echo '<br><a href="/login">戻る</a>';
-            exit;
-        }
+    // public function dashboard()
+    // {
+    //     $user = Auth::user()->id;
 
+    //     $role_data = DB::table('emp')
+    //         ->select('authority_id')
+    //         ->join('roles', 'emp.role', '=', 'roles.id')
+    //         ->join('authority_role', 'roles.id', '=', 'role_id')
+    //         ->where('empno', '=', $user)->get();
 
-        $user_id = $req->user_id;
-        $password = $req->password;
+    //     $encode = json_decode(json_encode($role_data), true);
+    //     $array = Arr::flatten($encode);
 
-        if (!$user_id) {
-            echo 'ユーザＩＤが入力されていません';
-            exit;
-          } else if (preg_match("/^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$/", $user_id)) {
-          } else {
-            print 'ユーザＩＤは半角英数記号のみ。';
-            exit;
-          }
-
-          if (!$password) {
-            echo 'パスワードが入力されていません';
-            exit;
-          } else if (preg_match("/^([a-zA-Z0-9!-\/:-@¥[-`{_~?]{8,})$/", $password)) {
-          } else {
-            print 'パスワードは半角英数記号８文字以上';
-            exit;
-          }
-
-        $members = DB::table('emp')->where('id', $user_id)->get();
-        foreach ($members as $member) {
-        }
-
-        //入力されたIDがDBのidに存在するか確認
-        if (!isset($member->id)) {
-            echo 'ユーザーＩＤもしくはパスワードが間違っています';
-            echo '<br>';
-            echo '<a href="/login">戻る</a>';
-            exit;
-        }
-
-        // 入力されたパスワードとDBのパスワードを照合
-        if (password_verify($password, $member->password)) {
-            // echo 'OK';
-        } else {
-            echo 'ユーザーＩＤもしくはパスワードが間違っています';
-            echo '<br>';
-            echo '<a href="/login">戻る</a>';
-            exit;
-        }
-
-        session(['user' => 'use_id']);
-
-        $data = ['member' => $member];
-        // print_r($data);
-        return view('mypage', $data);
-    }
+    //     $data = ['array' => $array];
+    //     return view('dashboard', $data);
+    // }
 
     public function list1(Request $req)
     {
@@ -1391,137 +1351,235 @@ class TestController extends Controller
 
     public function logserch(Request $req)
     {
-        $searchlog = DB::table('user_logs')->select(
-            'user_id', 'ip_address', 'user_agent', 'session_id',
-            'access_url', 'operation', 'access_time')
-            ->where($req->val, 'like', "%$req->word%")->orderby('access_time', 'desc')->get();
-        return response()->json($searchlog);
+        if (!empty($req->word)) {
+            $searchlog = DB::table('user_logs')->select(
+                'user_id', 'ip_address', 'user_agent', 'session_id',
+                'access_url', 'operation', 'access_time')
+                ->where($req->val, 'like', "%$req->word%")->orderby('access_time', 'desc')->get();
+            $pager = DB::table('user_logs')->select(
+                'user_id', 'ip_address', 'user_agent', 'session_id',
+                'access_url', 'operation', 'access_time')
+                ->where($req->val, 'like', "%$req->word%")->orderby('access_time', 'desc')->paginate(10);
+            // $pager_link = $pager->appends(request()->query())->links('pagination::bootstrap-4');
+            $dataArray = [$searchlog];
+                return response()->json($dataArray);
+        } else {
+            $searchlog = DB::select("select * from user_logs where access_time between '$req->day1' and '$req->day2'");
+            return response()->json($searchlog);
+        }
     }
 
     public function logcsvd(Request $req) {
+        return response()->streamDownload(
+            function () {
+                // 出力バッファをopen
+                $stream = fopen('php://output', 'w');
+                // 文字コードをShift-JISに変換
+                stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
 
-        // if($word) {
-        //     return response()->streamDownload(
-        //         function () use($val, $word) {
-        //             // 出力バッファをopen
-        //             $stream = fopen('php://output', 'w');
-        //             // 文字コードをShift-JISに変換
-        //             stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
-
-        //         // ヘッダー
-        //         fputcsv($stream, [
-        //             'access_time',
-        //             'user_id',
-        //             'ip_address',
-        //             'user_agent',
-        //             'session_id',
-        //             'access_url',
-        //             'operation',
-        //         ]);
-        //         // データ
-        //         $csv =DB::table('user_logs')->select('*')->where($val, 'like', '%'.$word.'%')->get();
-        //         foreach ($csv as $log) {
-        //             fputcsv($stream, [
-        //                 $log->access_time,
-        //                 $log->user_id,
-        //                 $log->ip_address,
-        //                 $log->user_agent,
-        //                 $log->session_id,
-        //                 $log->access_url,
-        //                 $log->operation,
-        //             ]);
-        //         }
-        //         fclose($stream);
-        //         },
-        //         'log.csv',
-        //         [
-        //             'Content-Type' => 'application/octet-stream',
-        //         ]
-        //     );
-        // } else {
-            return response()->streamDownload(
-                function () {
-                    // 出力バッファをopen
-                    $stream = fopen('php://output', 'w');
-                    // 文字コードをShift-JISに変換
-                    stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
-
-                    // ヘッダー
+                // ヘッダー
+                fputcsv($stream, [
+                    'access_time',
+                    'user_id',
+                    'ip_address',
+                    'user_agent',
+                    'session_id',
+                    'access_url',
+                    'operation',
+                ]);
+                // データ
+                $csv =DB::table('user_logs')->get();
+                foreach ($csv as $log) {
                     fputcsv($stream, [
-                        'access_time',
-                        'user_id',
-                        'ip_address',
-                        'user_agent',
-                        'session_id',
-                        'access_url',
-                        'operation',
+                        $log->access_time,
+                        $log->user_id,
+                        $log->ip_address,
+                        $log->user_agent,
+                        $log->session_id,
+                        $log->access_url,
+                        $log->operation,
                     ]);
-                    // データ
-                    $csv =DB::table('user_logs')->get();
-                    foreach ($csv as $log) {
-                        fputcsv($stream, [
-                            $log->access_time,
-                            $log->user_id,
-                            $log->ip_address,
-                            $log->user_agent,
-                            $log->session_id,
-                            $log->access_url,
-                            $log->operation,
-                        ]);
-                    }
-                    fclose($stream);
-                },
-                'log.csv',
-                [
-                    'Content-Type' => 'application/octet-stream',
-                ]
-            );
-        // }
+                }
+                fclose($stream);
+            },
+            'log.csv',
+            [
+                'Content-Type' => 'application/octet-stream',
+            ]
+        );
     }
 
-
-
-    public function aaa(Request $req)
+    public static function logdeletion()
     {
-        //passwordをhash化
-        // $pass = DB::table('emp')
-        //     ->select('password')
-        //     ->where('empno', 2001)->get();
+        $conditions = DB::table('schedulers')->select('conditions')->where('name', 'log_delete')->get();
+        $encode = json_decode(json_encode($conditions), true);
+        $array = Arr::flatten($encode);
+        $condition = $array[0];
 
-        //     foreach ($pass as $pas) {
-        //     }
-        // $rrr = $pas->password;
+        $limitday = Carbon::today()->subDay($condition);
+        DB::table('user_logs')->whereDate('created_at', '<=', $limitday)->delete();
+    }
 
-        // $hashpass = password_hash($rrr, PASSWORD_DEFAULT);
-
-        // DB::table('emp')->where('empno', 2001)->update([
-        //     'password' => $hashpass,
-        // ]);
-
-
+    public function schedule(Request $req)
+    {
         $user = Auth::user()->id;
 
         $role_data = DB::table('emp')
-            ->select('authority_id', 'roles.name')
+            ->select('authority_id')
             ->join('roles', 'emp.role', '=', 'roles.id')
             ->join('authority_role', 'roles.id', '=', 'role_id')
             ->where('empno', '=', $user)->get();
 
         $encode = json_decode(json_encode($role_data), true);
         $array = Arr::flatten($encode);
-        // $ketu_role = $encode[0]['authority_id'];
-        // $khen_role = $encode[1]['authority_id'];
-        // $betu_role = $encode[2]['authority_id'];
-        // $bhen_role = $encode[3]['authority_id'];
-        // $role_name = $encode[0]['name'];
 
-        // print_r($ketu_role."\n");
-        // print_r($khen_role."\n");
-        // print_r($betu_role."\n");
-        // print_r($bhen_role."\n");
-        // print_r($role_name);
-         echo($array);
-        // dd( $array );
-        // dd( $ar );
+        if (in_array(5, $array)) {
+            $scheduler = DB::table('schedulers')->get();
+            $encode2 = json_decode(json_encode($scheduler), true);
+            $array2 = Arr::flatten($encode2);
+            // print_r($array2);
+            $num = $array2[2];
+            $interval = $array2[3];
+            $interval1 = $array2[4];
+            $interval2 = $array2[5];
+            $intervalday = $array2[6];
+            $intervalhour = $array2[7];
+            $conditions = $array2[8];
+
+            $data = ['num' => $num, 'interval' => $interval, 'interval1' => $interval1, 'interval2' => $interval2, 'intervalday' => $intervalday, 'intervalhour' => $intervalhour, 'conditions' => $conditions,];
+
+            return view('schedule', $data);
+        } else {
+            return view('dashboard');
+        }
+    }
+
+    public function setting1(Request $req)
+    {
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(5, $array)) {
+            $number1or2 = $req->number1or2;
+            $time1 = $req->time1;
+            $time2 = $req->time2;
+            $time3 = $req->time3;
+
+            $settingdata = DB::table('schedulers')->where('name', 'log_delete')->update([
+                            'num' => $number1or2,
+                            'interval' => $time1,
+                            'interval1' => $time2,
+                            'interval2' => $time3,
+                            'intervalday' => "",
+                            'intervalhour' => "",
+                        ]);
+
+            return response()->json($settingdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
+    }
+
+    public function setting2(Request $req)
+    {
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(5, $array)) {
+            $day = $req->day;
+            $hour = $req->hour;
+
+            $settingdata = DB::table('schedulers')->where('name', 'log_delete')->update([
+                            'num' => "",
+                            'interval' => "",
+                            'interval1' => "",
+                            'interval2' => "",
+                            'intervalday' => $day,
+                            'intervalhour' => $hour,
+                        ]);
+
+            return response()->json($settingdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
+    }
+
+    public function setting3(Request $req)
+    {
+        $user = Auth::user()->id;
+
+        $role_data = DB::table('emp')
+            ->select('authority_id')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->join('authority_role', 'roles.id', '=', 'role_id')
+            ->where('empno', '=', $user)->get();
+
+        $encode = json_decode(json_encode($role_data), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array(5, $array)) {
+            $settingdata = DB::table('schedulers')->where('name', 'log_delete')->update([
+                            'conditions' => $req->conditions,
+                        ]);
+
+            return response()->json($settingdata);
+        } else {
+            $data = ['alert_message' => '不正な通信です'];
+            return response()->json($data);
+        }
+    }
+
+    public function send(Request $req)
+    {
+        $name = 'テスト ユーザー';
+        $email = 'test@example.com';
+
+        Mail::send('mail', [
+            'name' => $name,
+        ], function ($message) use ($email) {
+            $message->to($email)
+                ->subject('テストタイトル');
+        });
+
+        return view('welcome');
+    }
+
+
+
+
+    public function aaa(Request $req)
+    {
+
+        $user = Auth::user();
+        // $user2 = (int)('6001tanaka');
+
+        // $role_data = DB::table('emp')
+        //     ->select('authority_id', 'roles.name')
+        //     ->join('roles', 'emp.role', '=', 'roles.id')
+        //     ->join('authority_role', 'roles.id', '=', 'role_id')
+        //     ->where('empno', '=', $user)->get();
+
+        // $encode = json_decode(json_encode($role_data), true);
+        // $array = Arr::flatten($encode);
+         echo($user);
+        //  echo($user2);
     }
 }

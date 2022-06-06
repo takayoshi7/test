@@ -11789,22 +11789,39 @@ $(function () {
     });
     var val = document.getElementsByClassName("rog_list")[0].value;
     var word = $('#word').val();
+    var firstday = $('#firstday').val();
+    var finalday = $('#finalday').val();
+    var firsttime = $('#firsttime').val();
+    var finaltime = $('#finaltime').val();
 
-    // console.log(val);
+    if (firsttime == '') {
+        var firsttime = '00:00';
+    }
+
+    if (finaltime == '') {
+        var finaltime = '23:59';
+    }
+
+    var day1 = firstday + ' ' + firsttime + ':00';
+    var day2 = finalday + ' ' + finaltime + ':00';
+
     // console.log(word);
-
+    // console.log(day1);
+    // console.log(day2);
         $.ajax({
         url: '/logserch',
         type: 'POST',
         datatype: 'json',
-        data: {'val' : val, 'word' : word}
+        data: {'val' : val, 'word' : word, 'day1' : day1, 'day2' : day2}
         })
 
         .done(function(results) {
             // console.log(results);
+            var data = results[0];
+            // var pagenate = results[1];
             var rows = "";
 
-            $.each(results, function(index, value) {
+            $.each(data, function(index, value) {
                 rows += "<tr>";
                 rows += "<td>";
                 rows += value.access_time;
@@ -11816,7 +11833,8 @@ $(function () {
                 rows += value.ip_address;
                 rows += "</td>";
                 rows += "<td>";
-                rows += value.user_agent;
+                rows += value.user_agent.substr(0, 50) + '...';
+                rows += '<button type="button" class="pop">表示</button>'; //反応しない
                 rows += "</td>";
                 rows += "<td>";
                 rows += value.session_id;
@@ -11833,6 +11851,11 @@ $(function () {
 
             //テーブルに作成したhtmlを追加する
             $("#loglist").html(rows);
+            // $("#pagenate").append(pagenate);
+
+            if (results.length === 0) {
+            $("#loglist").after('<p>データがありません</p>');
+            }
         })
 
         .fail(function() {
@@ -11840,6 +11863,193 @@ $(function () {
     });
   });
 
+
+  $('.detail').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var empno = $(this).attr('value');
+    // console.log(deptid);
+    var deleteConfirm = confirm('画像を削除してよろしいでしょうか？');
+
+    if(deleteConfirm == true) {
+        $.ajax({
+        url: '/imgdelete2',
+        type: 'POST',
+        datatype: 'json',
+        data: {'empno' : empno}
+        })
+
+        .done(function(data) {
+            alert("削除しました");
+            window.location.reload();
+        })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+        });
+
+    } else {
+        return false;
+    }
+  });
+
+
+  $('#setting1').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var number1or2 = $('#number1or2').val();
+    var firsttime1 = $('#firsttime1').val();
+    var firsttime2 = $('#firsttime2').val();
+    var finaltime2 = $('#finaltime2').val();
+
+    // console.log(number1or2);
+    // console.log(firsttime1);
+    // console.log(firsttime2);
+    // console.log(finaltime2);
+
+    if (number1or2 == 1) {
+        var time1 = firsttime1;
+        var time2 = "";
+        var time3 = "";
+        var setting1Confirm = confirm('1日：' + number1or2 + '回、\n' +  firsttime1 + '時に設定しますか？');
+
+        if(setting1Confirm == true) {
+        } else {
+            return false;
+        };
+    } else {
+        var time1 = "";
+        var time2 = firsttime2;
+        var time3 = finaltime2;
+        var setting11Confirm = confirm('1日：' + number1or2 + '回、\n' +  firsttime2 + '時と' + finaltime2 + '時に設定しますか？');
+
+        if(setting11Confirm == true) {
+        } else {
+            return false;
+        };
+    }
+
+        $.ajax({
+        url: '/setting1',
+        type: 'POST',
+        datatype: 'json',
+        data: {'number1or2' : number1or2, 'time1' : time1, 'time2' : time2, 'time3' : time3}
+        })
+
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("設定しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
+            })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+    });
+  });
+
+
+  $('#setting2').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var selectinterval = $('#selectinterval').val();
+    // var intervalday = $('#intervalday').val();
+    var intervalhour = $('#intervalhour').val();
+
+    // console.log(selectinterval);
+    // console.log(intervalday);
+    // console.log(intervalhour);
+
+    // if (selectinterval == "日数") {
+    //     var day = intervalday;
+    //     var hour = "";
+    //     var setting2Confirm = confirm(intervalday + '日ごとに設定しますか？');
+
+    //     if(setting2Confirm == true) {
+    //     } else {
+    //         return false;
+    //     };
+    // } else if (selectinterval == "時間") {
+        var day = "";
+        var hour = intervalhour;
+        var setting22Confirm = confirm(intervalhour + '分ごとに設定しますか？');
+
+        if(setting22Confirm == true) {
+        } else {
+            return false;
+        };
+    // }
+
+        $.ajax({
+        url: '/setting2',
+        type: 'POST',
+        datatype: 'json',
+        data: {'selectinterval' : selectinterval, 'day' : day, 'hour' : hour}
+        })
+
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("設定しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
+            })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+    });
+  });
+
+
+  $('#setting3').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var conditions = $('#conditions').val();
+
+    // console.log(conditions);
+
+        var setting3Confirm = confirm('保存日数を' + conditions + '日に設定しますか？');
+
+        if(setting3Confirm == true) {
+        } else {
+            return false;
+        };
+
+        $.ajax({
+        url: '/setting3',
+        type: 'POST',
+        datatype: 'json',
+        data: {'conditions' : conditions}
+        })
+
+        .done(function(data) {
+            if (!data.alert_message) {
+                alert("設定しました");
+                window.location.reload();
+            } else {
+                alert(data.alert_message);
+            }
+            })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+    });
+  });
 
 });
 

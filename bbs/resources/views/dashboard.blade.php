@@ -1,5 +1,3 @@
-@extends('layouts.app2')
-
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -53,4 +51,47 @@
         <div id="img2error"></div>
         </form>
     </div>
+<script type="text/javascript">
+    function img1func(empno) {
+        $('#simg1').val("");
+        $('#img1error').html("");
+        $('#dialog_empno').val(empno);
+
+        $("#select_img1").dialog("open");
+    }
+
+    $(function() {
+        $("#select_img1").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"画像選択",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+
+    function img2func(empno) {
+        $('#simg2').val("");
+        $('#img2error').html("");
+        $('#dialog_empno').val(empno);
+
+        $("#select_img2").dialog("open");
+    }
+
+    $(function() {
+        $("#select_img2").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"画像選択",
+        buttons: {
+        "キャンセル": function() {
+            $(this).dialog("close");
+        },
+        }
+        });
+    });
+</script>
 </x-app-layout>

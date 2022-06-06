@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Emp;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -34,13 +34,15 @@ class RegisteredUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'id' => ['required', 'string', 'max:20', 'regex:/^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$/'],
+            'empno' => ['required', 'integer', 'regex:/^([1-9][0-9]{3})/'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:emp'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
+        $user = Emp::create([
+            'id' => $request->id,
+            'empno' => $request->empno,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
