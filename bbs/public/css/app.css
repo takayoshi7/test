@@ -1448,7 +1448,7 @@ th {
 
 td {
     text-align: center;
-    width: 80;
+    /* width: 80; */
     border-style: groove;
 }
 
@@ -1466,6 +1466,10 @@ input.resize{
 
 input.resize2{
     width:104px;
+}
+
+input.resize3{
+    width:300px;
 }
 
 .popup {
@@ -1489,4 +1493,250 @@ input.resize2{
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.focus {
+    background: #FFCCFF;
+}
+
+div.abc {
+    width: 40%;
+    border: ridge;
+    margin: 0 auto;
+
+}
+
+div.nameclass {
+    width: 100%;
+    height: auto;
+    border-bottom: ridge;
+    text-align: center;
+    margin: 0 auto;
+    padding:1% 1%;
+}
+
+div.imgclass {
+    display: grid;
+    height: auto;
+    grid-template-columns: 50% 50%;
+    text-align: center;
+}
+
+div.imgArea {
+    width: 100%;
+    height: auto;
+    border: ridge;
+    margin: 0 auto;
+}
+
+.myimg {
+    margin: 0 auto;
+    width: 40%;
+}
+
+div.greeting {
+    text-align: center;
+}
+
+div.emailclass {
+    height: auto;
+    border-top: ridge;
+    border-bottom: ridge;
+    text-align: center;
+    margin: 0 auto;
+    padding:1% 1%;
+}
+
+div.addressclass {
+    height: auto;
+    margin: 0 auto;
+    padding: 1% 0 1% 20%;
+}
+
+div.telclass {
+    height: auto;
+    margin: 0 auto;
+    text-align: center;
+    padding:1% 1%;
+}
+
+div.err_zip {
+    color: red;
+}
+
+div.err_tel {
+    color: red;
+}
+
+#getaddress {
+    width: 50%;
+}
+
+#address2 {
+    width: 50%;
+}
+
+.img1 {
+    margin-top: 5px;
+}
+
+.img2 {
+    margin-top: 5px;
+}
+
+div.drop-zone1 {
+    border: double;
+    margin: 0 auto;
+    width: 70%;
+    height: auto;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    background-color: #ffffe0;
+}
+
+div.drop-zone2 {
+    border: double;
+    margin: 0 auto;
+    width: 70%;
+    height: auto;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    background-color: #ffffe0;
+}
+
+label.original {
+    background-color: rgb(218, 255, 250);
+    padding: 2px;
+    border-radius: 12px;
+    border: outset;
+}
+
+div.preview1 {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.preview2 {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.drop-zone1list {
+    border: double;
+    margin: 0 auto;
+    width: 150px;
+    height: 5rem;
+    margin-top: 5px;
+    background-color: #ffffe0;
+}
+
+div.drop-zone2list {
+    border: double;
+    margin: 0 auto;
+    width: 150px;
+    height: 5rem;
+    margin-top: 5px;
+    background-color: #ffffe0;
+}
+
+div.preview1list {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.preview2list {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.listimgArea {
+    display: flex;
+    flex-wrap: wrap;
+    width: fit-content;
+}
+
+div.list {
+    text-align: center;
+}
+
+.listmyimg {
+    margin: 0 auto;
+    width: 30%;
+}
+
+label.original2 {
+    background-color: rgb(218, 255, 250);
+    padding: 0px;
+    border-radius: 12px;
+    border: outset;
+}
+
+input[type=text] {
+    height:30px;
+}
+
+div#addressbutton {
+    text-align: center;
+    border-bottom: ridge;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.top {
+    margin: 0 auto;
+    text-align: center;
+    /* height: 5rem; */
+    /* padding: 1% 0 1% 0%; */
+
+}
+
+.wrap {
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:100%;
+    /* border: double; */
+
+}
+
+.title {
+    width:10%;
+    /* border: double; */
+
+}
+
+.insert {
+    width: 10%;
+    text-align: center;
+    /* border: double; */
+}
+
+.category {
+    width: 30%;
+    /* border: double; */
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.sort {
+    width:30%;
+    /* border: double; */
+}
+
+.page {
+    width:20%;
+    /* border: double; */
+    text-align: right;
+}
+
+strong {
+    color: #2563eb;
 }

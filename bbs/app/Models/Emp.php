@@ -17,7 +17,7 @@ class Emp extends Authenticatable implements MustVerifyEmail
      * @var string
      */
     protected $table = 'emp';
-    protected $fillable = ['id','password','email','empno','ename','job','mgr','hiredate','sal','comm','deptno','img1','img2','role'];
+    protected $fillable = ['id','password','email','email_verified_at','empno','ename','job','mgr','hiredate','sal','comm','deptno','img1','img2','role'];
 
      /**
      * The primary key for the model.

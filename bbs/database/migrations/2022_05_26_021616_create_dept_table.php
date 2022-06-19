@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('deptno');
             $table->string('dname');
             $table->string('loc');
+            $table->integer('sort');
         });
     }
 

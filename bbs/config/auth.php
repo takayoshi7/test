@@ -87,7 +87,7 @@ return [
     */
 
     'passwords' => [
-        'users' => [
+        'emp' => [
             'provider' => 'emp',
             'table' => 'password_resets',
             'expire' => 60,

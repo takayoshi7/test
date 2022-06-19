@@ -71,5 +71,12 @@ class Kernel extends HttpKernel
         'csvup' => \App\Http\Middleware\CsvupLog::class,
         'csvdown' => \App\Http\Middleware\CsvdownLog::class,
         'rolechange' => \App\Http\Middleware\RolechangeLog::class,
+        'mailsend' => \App\Http\Middleware\MailSend::class,
+        'authoritycheck' => \App\Http\Middleware\AuthorityCheck::class,
+        'logcsvdown' => \App\Http\Middleware\LogcsvdownLog::class,
+        'addresschange' => \App\Http\Middleware\AddresschangeLog::class,
+        'mailchange' => \App\Http\Middleware\MailchangeLog::class,
+        'namechange' => \App\Http\Middleware\NamechangeLog::class,
+        'phonechange' => \App\Http\Middleware\PhonechangeLog::class,
     ];
 }

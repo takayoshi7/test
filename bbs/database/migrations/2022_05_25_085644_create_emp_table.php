@@ -14,9 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('emp', function (Blueprint $table) {
-            $table->string('id',20);
+            $table->string('id',20)->unique();
             $table->string('password',100);
-            $table->string('email',100);
+            $table->string('remember_token',100);
+            $table->string('email',100)->unique();
+            $table->timestamps('email_verified_at');
             $table->integer('empno');
             $table->string('ename',20);
             $table->string('job',20);
@@ -28,6 +30,10 @@ return new class extends Migration
             $table->string('img1');
             $table->string('img2');
             $table->string('role',20);
+            $table->integer('post_code');
+            $table->string('address1',100);
+            $table->string('address2',100);
+            $table->integer('phone_number');
         });
     }
 

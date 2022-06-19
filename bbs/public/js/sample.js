@@ -10942,104 +10942,38 @@ $(function () {
     var inshiredate = $('#inshiredate').val();
     var inssal = $('#inssal').val();
     var inscomm = $('#inscomm').val();
-    var insdeptno = $('#insdeptno').val();
-
-    var insertConfirm = confirm('ユーザＩＤ：' + insid + '、社員コード：' + insempno + '、社員名：' + insename
-                                + '、職種：' + insjob + '、上司コード：' + insmgr + '、入社日：' + inshiredate
-                                + '、給与：' + inssal + '、comm：' + inscomm + '、部署コード：' + insdeptno
-                                + '\n' + 'を追加してよろしいでしょうか？');
-
-    if(insertConfirm == true) {
-        $.ajax({
-        url: '/insert1',
-        type: 'POST',
-        datatype: 'json',
-        data: {'insid' : insid,
-                'insempno' : insempno,
-                'insename' : insename,
-                'insjob' : insjob,
-                'insmgr' : insmgr,
-                'inshiredate' : inshiredate,
-                'inssal' : inssal,
-                'inscomm' : inscomm,
-                'insdeptno' : insdeptno
-                }
-        })
-
-        .done(function(data) {
-            if (!data.alert_message) {
-                alert("追加しました");
-                window.location.reload();
-            } else {
-                alert(data.alert_message);
-            }
-        })
-
-        .fail(function(error) {
-        console.log(error.statusText);
-        });
-
-    } else {
-        return false;
-    }
-  });
-
-  $(".edit1").on('click', function () {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    var editemp = $(this).attr('value');
-    var editemp2 = editemp.split(",");
-    var editid = editemp2[0];
-    var editempno = editemp2[1];
-    var editename = editemp2[2];
-    var editjob = editemp2[3];
-    var editmgr = editemp2[4];
-    var edithiredate = editemp2[5];
-    var editsal = editemp2[6];
-    var editcomm = editemp2[7];
-    var editdeptno = editemp2[8];
+    var str = $('#insdeptno').val();
+    var arr = str.split(':');
+    var insdeptno = arr[0];
 
     $.ajax({
-    url: '/editcheck1',
+    url: '/insert1',
     type: 'POST',
     datatype: 'json',
-    data: {'editid' : editid,
-            'editempno' : editempno,
-            'editename' : editename,
-            'editjob' : editjob,
-            'editmgr' : editmgr,
-            'edithiredate' : edithiredate,
-            'editsal' : editsal,
-            'editcomm' : editcomm,
-            'editdeptno' : editdeptno
+    data: {'insid' : insid,
+            'insempno' : insempno,
+            'insename' : insename,
+            'insjob' : insjob,
+            'insmgr' : insmgr,
+            'inshiredate' : inshiredate,
+            'inssal' : inssal,
+            'inscomm' : inscomm,
+            'insdeptno' : insdeptno
             }
     })
 
     .done(function(data) {
         if (!data.alert_message) {
-            $("#e1").text(data[0]);
-            $("#e2").text(data[1]);
-            $("#e3").text(data[2]);
-            $("#e4").text(data[3]);
-            $("#e5").text(data[4]);
-            $("#e6").text(data[5]);
-            $("#e7").text(data[6]);
-            $("#e8").text(data[7]);
-            $("#e9").text(data[8]);
+            alert("追加しました");
+            window.location.reload();
         } else {
             alert(data.alert_message);
         }
-
     })
 
-    .fail(function() {
-    // console.log(error.statusText);
-    alert("エラーが発生しました");
+    .fail(function(error) {
+    console.log(error.statusText);
     });
-
   });
 
   $("#edit1btn").on('click', function () {
@@ -11056,48 +10990,41 @@ $(function () {
     var ed6 = $('#ee6').val();
     var ed7 = $('#ee7').val();
     var ed8 = $('#ee8').val();
-    var ed9 = $('#ee9').val();
-    var edid = $('#e1').text();
+    var str = $('#ee9').val();
+    var arr = str.split(':');
+    var ed9 = arr[0];
+    var edid = $('#e1').val();
 
-    var editConfirm = confirm('ユーザＩＤ：' + ed1 + '、社員コード：' + ed2 + '、社員名：' + ed3
-                            + '、職種：' + ed4 + '、上司コード：' + ed5 + '、入社日：' + ed6
-                            + '、給与：' + ed7 + '、comm：' + ed8 + '、部署コード：' + ed9
-                            + '\n' + 'に更新してよろしいでしょうか？');
-
-    if(editConfirm == true) {
-        $.ajax({
-        url: '/edit1',
-        type: 'POST',
-        datatype: 'json',
-        data: {'ed1' : ed1,
-               'ed2' : ed2,
-               'ed3' : ed3,
-               'ed4' : ed4,
-               'ed5' : ed5,
-               'ed6' : ed6,
-               'ed7' : ed7,
-               'ed8' : ed8,
-               'ed9' : ed9,
-               'edid' : edid,
+    $.ajax({
+      url: '/edit1',
+      type: 'POST',
+      datatype: 'json',
+      data: {'ed1' : ed1,
+             'ed2' : ed2,
+             'ed3' : ed3,
+             'ed4' : ed4,
+             'ed5' : ed5,
+             'ed6' : ed6,
+             'ed7' : ed7,
+             'ed8' : ed8,
+             'ed9' : ed9,
+             'edid' : edid,
             }
-        })
+    })
 
-        .done(function(data) {
-            if (!data.alert_message) {
-                alert("更新しました");
-                window.location.reload();
-            } else {
-                alert(data.alert_message);
-            }
-        })
+    .done(function(data) {
+        if (!data.alert_message) {
+            alert("更新しました");
+            window.location.reload();
+        } else {
+            alert(data.alert_message);
+        }
+    })
 
-        .fail(function() {
-        alert("エラーが発生しました");
-        });
+    .fail(function() {
+    alert("エラーが発生しました");
+    });
 
-    } else {
-        return false;
-    }
   });
 
   $('.delete1').on('click', function () {
@@ -11107,7 +11034,7 @@ $(function () {
         }
     });
     var empno = $(this).attr('value');
-    // console.log(deptid);
+
     var deleteConfirm = confirm('社員コード：' + empno + 'を削除してよろしいでしょうか？');
 
     if(deleteConfirm == true) {
@@ -11136,106 +11063,15 @@ $(function () {
     }
   });
 
-  $("#esearchbtn").on('click', function () {
+  $("#search1btn").on('click', function () {
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },//Headersを書き忘れるとエラーになる
+        },
     });
     var ename = $('#esearch').val();
-    var searchConfirm = confirm(ename + 'で検索してよろしいでしょうか？');
+    var dispnum = $('#dispnum').val();
 
-    if(searchConfirm == true) {
-        $.ajax({
-        url: '/enamesearch',
-        type: 'POST',
-        datatype: 'json',
-        data: {"ename" : ename},
-        })
-
-        .done(function(results) {
-        alert("検索しました");
-
-        var rows = "";
-
-        for (i = 0; i < results.length; i++) {
-            rows += "<tr>";
-            rows += "<td>";
-            rows += results[i].id;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].empno;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].ename;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].job;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].mgr;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].hiredate;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].sal;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].comm;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].deptno;
-            rows += "</td>";
-            rows += "</tr>";
-        }
-
-        //テーブルに作成したhtmlを追加する
-        $("#tbl").html(rows);
-
-
-        // $("#id").text(results[0].id);
-        // $("#empno").text(results[0].empno);
-        // $("#ename").text(results[0].ename);
-        // $("#job").text(results[0].job);
-        // $("#mgr").text(results[0].mgr)
-        // $("#hiredate").text(results[0].hiredate);
-        // $("#sal").text(results[0].sal);
-        // $("#comm").text(results[0].comm);
-        // $("#deptno").text(results[0].deptno);
-        // $("#id2").text(results[1].id);
-        // $("#empno2").text(results[1].empno);
-        // $("#ename2").text(results[1].ename);
-        // $("#job2").text(results[1].job);
-        // $("#mgr2").text(results[1].mgr)
-        // $("#hiredate2").text(results[1].hiredate);
-        // $("#sal2").text(results[1].sal);
-        // $("#comm2").text(results[1].comm);
-        // $("#deptno2").text(results[1].deptno);
-        // $("#id3").text(results[2].id);
-        // $("#empno3").text(results[2].empno);
-        // $("#ename3").text(results[2].ename);
-        // $("#job3").text(results[2].job);
-        // $("#mgr3").text(results[2].mgr)
-        // $("#hiredate3").text(results[2].hiredate);
-        // $("#sal3").text(results[2].sal);
-        // $("#comm3").text(results[2].comm);
-        // $("#deptno3").text(results[2].deptno);
-        })
-        .fail(function() {
-        alert("エラーが発生しました");
-        });
-    } else {
-        return false; //キャンセルしたらなにもしない
-    };
-  });
-
-  $("#salsearchbtn").on('click', function () {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },//Headersを書き忘れるとエラーになる
-    });
     if ($('#minnum').val()) {
         var minnum = $('#minnum').val();
     } else {
@@ -11245,68 +11081,76 @@ $(function () {
     if ($('#maxnum').val()) {
         var maxnum = $('#maxnum').val();
     } else {
-        var maxnum =10000;
+        var maxnum =99999;
     }
 
-    var searchConfirm = confirm('最小値：' + minnum + '、最大値：' + maxnum + 'で検索してよろしいでしょうか？');
-
-    if(searchConfirm == true) {
-        $.ajax({
-        url: '/salsearch',
-        type: 'POST',
+    $.ajax({
+        url: '/search1',
+        type: 'get',
         datatype: 'json',
-        data: {"minnum" : minnum, "maxnum" : maxnum},
-        })
+        data: {"ename" : ename,
+               "minnum" : minnum,
+               "maxnum" : maxnum,
+               "dispnum" :dispnum
+              },
+    })
 
-        .done(function(results) {
+    .done(function(results) {
         alert("検索しました");
-
         var rows = "";
 
-        for (i = 0; i < results.length; i++) {
-            rows += "<tr>";
-            rows += "<td>";
-            rows += results[i].id;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].empno;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].ename;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].job;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].mgr;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].hiredate;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].sal;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].comm;
-            rows += "</td>";
-            rows += "<td>";
-            rows += results[i].deptno;
-            rows += "</td>";
-            rows += "</tr>";
+        for (i = 0; i < results['searchdata']['data'].length; i++) {
+            rows += `<tr><td>${ results['searchdata']['data'][i].id }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].empno }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].ename }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].job }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].mgr }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].hiredate }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].sal }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].comm }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].deptno }</td>`
+            if (results['searchdata']['data'][i].img1) {
+                rows += `<td><img class="listmyimg" src="data:image/png;base64,${ results['searchdata']['data'][i].img1 }" width="30px">`
+            } else {
+                rows += `<td><img class="listmyimg" src="storage/img/no_image.jpg" width="30px">`
+            }
+            if (results['array'].includes(2)) {
+                rows += `<button type="button" class="img1" onclick="img1func(${ results['searchdata']['data'][i].empno })">変更</button></td>`
+            } else {
+                rows += `</td>`
+            }
+            if (results['searchdata']['data'][i].img2) {
+                rows += `<td><img class="listmyimg" src="storage/img/${ results['searchdata']['data'][i].img2 }" width="30px">`
+            } else {
+                rows += `<td><img class="listmyimg" src="storage/img/no_image.jpg" width="30px">`
+            }
+            if (results['array'].includes(2)) {
+                rows += `<button type="button" class="img2" onclick="img2func(${ results['searchdata']['data'][i].empno })">変更</button></td>`
+            } else {
+                rows += `</td>`
+            }
+            if (results['array'].includes(2)) {
+                rows += `<td><button type="button" class="edit1" value="${ results['searchdata']['data'][i].id }, ${ results['searchdata']['data'][i].empno }, ${ results['searchdata']['data'][i].ename }, ${ results['searchdata']['data'][i].job }, ${ results['searchdata']['data'][i].mgr }, ${ results['searchdata']['data'][i].hiredate }, ${ results['searchdata']['data'][i].sal }, ${ results['searchdata']['data'][i].comm }, ${ results['searchdata']['data'][i].deptno }" onclick="edit1func(this.value)">編集</button></td>`
+                rows += `<td><button type="button" class="delete1" value="${ results['searchdata']['data'][i].empno }">削除</button></td>`
+            }
+            rows += `<td>${ results['searchdata']['data'][i].name }<br>`
+            if (results['roles_name'] === '管理者') {
+                rows += `<button type="button"  class="role1" onclick="roleselect(${ results['searchdata']['data'][i].empno })">変更</button></td></tr>`
+            } else {
+                rows += `</td></tr>`
+            }
         }
-
-        //テーブルに作成したhtmlを追加する
-        $("#tbl").html(rows);
-        })
-        .fail(function() {
+        $("#list1").html(rows);
+        $("input[name='enames']").val(results['ename']);
+        $("input[name='mins']").val(results['minnum']);
+        $("input[name='maxs']").val(results['maxnum']);
+        $("#searchlist1").dialog("close");
+        $("#pagination").html(`{{ ${ results['pager_link'] } }}`);
+    })
+    .fail(function() {
         alert("エラーが発生しました");
-        });
-    } else {
-        return false; //キャンセルしたらなにもしない
-    };
+    });
   });
-
-
 
   $("#insert2btn").on('click', function () {
     $.ajaxSetup({
@@ -11317,66 +11161,23 @@ $(function () {
     var insdeptno = $('#insdeptno').val();
     var insdname = $('#insdname').val();
     var insloc = $('#insloc').val();
-
-    var insertConfirm = confirm('部署コード：' + insdeptno + '、部署名：' + insdname + '、場所：' + insloc + '\n' + 'を追加してよろしいでしょうか？');
-
-    if(insertConfirm == true) {
-        $.ajax({
-        url: '/insert2',
-        type: 'POST',
-        datatype: 'json',
-        data: {'insdeptno' : insdeptno,
-               'insdname' : insdname,
-               'insloc' : insloc
-              }
-        })
-
-        .done(function(data) {
-            if (!data.alert_message) {
-                alert("追加しました");
-                window.location.reload();
-            } else {
-                alert(data.alert_message);
-            }
-        })
-
-        .fail(function() {
-        alert("エラーが発生しました");
-        });
-
-    } else {
-        return false;
-    }
-  });
-
-
-  $(".edit2").on('click', function () {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    var editdep = $(this).attr('value');
-    var editdept = editdep.split(",");
-    var editdeptno = editdept[0];
-    var editdname = editdept[1];
-    var editloc = editdept[2];
+    var inssort = $('#inssort').val();
 
     $.ajax({
-    url: '/editcheck2',
+    url: '/insert2',
     type: 'POST',
     datatype: 'json',
-    data: {'editdeptno' : editdeptno,
-           'editdname' : editdname,
-           'editloc' : editloc,
-          }
+    data: {'insdeptno' : insdeptno,
+            'insdname' : insdname,
+            'insloc' : insloc,
+            'inssort' : inssort
+            }
     })
 
     .done(function(data) {
         if (!data.alert_message) {
-            $("#d1").text(data[0]);
-            $("#d2").text(data[1]);
-            $("#d3").text(data[2]);
+            alert("追加しました");
+            window.location.reload();
         } else {
             alert(data.alert_message);
         }
@@ -11385,10 +11186,7 @@ $(function () {
     .fail(function() {
     alert("エラーが発生しました");
     });
-
   });
-
-
 
   $("#edit2btn").on('click', function () {
     $.ajaxSetup({
@@ -11399,43 +11197,33 @@ $(function () {
     var ed1 = $('#dd1').val();
     var ed2 = $('#dd2').val();
     var ed3 = $('#dd3').val();
-    var edid = $('#d1').text();
+    var ed4 = $('#dd4').val();
+    var edid = $('#d1').val();
 
-    // console.log(ed1);
-    // console.log(ed2);
-    // console.log(ed3);
-    // console.log(edid);
+    $.ajax({
+    url: '/edit2',
+    type: 'POST',
+    datatype: 'json',
+    data: {'ed1' : ed1,
+            'ed2' : ed2,
+            'ed3' : ed3,
+            'ed4' : ed4,
+            'edid' : edid,
+        }
+    })
 
-    var editConfirm = confirm('部署コード：' + ed1 + '、部署名：' + ed2 + '、場所：' + ed3 + '\n' + 'に更新してよろしいでしょうか？');
+    .done(function(data) {
+        if (!data.alert_message) {
+            alert("更新しました");
+            window.location.reload();
+        } else {
+            alert(data.alert_message);
+        }
+    })
 
-    if(editConfirm == true) {
-        $.ajax({
-        url: '/edit2',
-        type: 'POST',
-        datatype: 'json',
-        data: {'ed1' : ed1,
-               'ed2' : ed2,
-               'ed3' : ed3,
-               'edid' : edid,
-            }
-        })
-
-        .done(function(data) {
-            if (!data.alert_message) {
-                alert("更新しました");
-                window.location.reload();
-            } else {
-                alert(data.alert_message);
-            }
-        })
-
-        .fail(function() {
-        alert("エラーが発生しました");
-        });
-
-    } else {
-        return false;
-    }
+    .fail(function() {
+    alert("エラーが発生しました");
+    });
   });
 
 
@@ -11446,7 +11234,7 @@ $(function () {
         }
     });
     var deptid = $(this).attr('value');
-    // console.log(deptid);
+
     var deleteConfirm = confirm('部署コード：' + deptid + 'を削除してよろしいでしょうか？');
 
     if(deleteConfirm == true) {
@@ -11473,7 +11261,7 @@ $(function () {
     } else {
       return false;
     }
-    });
+  });
 
 
   $("#dsearchbtn").on('click', function () {
@@ -11483,46 +11271,42 @@ $(function () {
         },//Headersを書き忘れるとエラーになる
     });
     var dname = $('#dsearch').val();
-    var searchConfirm = confirm(dname + 'で検索してよろしいでしょうか？');
+    var dispnum = $('#dispnum').val();
 
-    if(searchConfirm == true) {
-      $.ajax({
-        url: '/dnamesearch',
-        type: 'POST',
-        datatype: 'json',
-        data: {"dname" : dname},
-      })
+    $.ajax({
+    url: '/dnamesearch',
+    type: 'get',
+    datatype: 'json',
+    data: {"dname" : dname, "dispnum" : dispnum},
+    })
 
-     .done(function(results) {
+    .done(function(results) {
+        // console.log(results['searchdata']['data']);
         alert("検索しました");
         var rows = "";
 
-        $.each(results, function(index, value) {
-            rows += "<tr>";
-            rows += "<td>";
-            rows += value.deptno;
-            rows += "</td>";
-            rows += "<td>";
-            rows += value.dname;
-            rows += "</td>";
-            rows += "<td>";
-            rows += value.loc;
-            rows += "</td>";
-            rows += "</tr>";
-        })
-
+        for (i = 0; i < results['searchdata']['data'].length; i++) {
+            rows += `<tr><td>${ results['searchdata']['data'][i].deptno }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].dname }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].loc }</td>`
+            rows += `<td>${ results['searchdata']['data'][i].sort }</td>`
+            if (results['array'].includes(4)) {
+                rows += `<td><button type="button" class="edit2" value="${ results['searchdata']['data'][i].deptno }, ${ results['searchdata']['data'][i].dname }, ${ results['searchdata']['data'][i].loc }, ${ results['searchdata']['data'][i].sort }" onclick="edit2func(this.value)">編集</button></td>`
+                rows += `<td><button type="button" class="delete2" value="${ results['searchdata']['data'][i].deptno }">削除</button></td></tr>`
+            } else {
+                rows += `</tr>`
+            }
+        }
         //テーブルに作成したhtmlを追加する
-        $("#tbl").html(rows); //上書き
-        // $("#tbl").append(rows); //後に挿入
-        // $("#tbl").prepend(rows); //前に挿入
-
-      })
+        $("#list2").html(rows); //上書き
+        // $("#list2").append(rows); //後に挿入
+        // $("#list2").prepend(rows); //前に挿入
+        $("input[name='dnames']").val(results['dname']);
+        $("#listsortnum").val(results['listsortnum']);
+    })
      .fail(function() {
         alert("エラーが発生しました");
     });
-    } else {
-        return false; //キャンセルしたらなにもしない
-    };
   });
 
 
@@ -11618,7 +11402,7 @@ $(function () {
     var form = $('#img1_form').get()[0];
     var formdata = new FormData(form);
     formdata.append("empno", $('#dialog_empno').val())
-    // console.log(formdata);
+    // console.log(form);
 
     // POSTでアップロード
     // dataにFormDataを指定する場合 processData,contentTypeをfalseにしてjQueryがdataを処理しないようにする
@@ -11634,10 +11418,10 @@ $(function () {
     .done(function(data) {
         // console.log(results);
         if (data === true) {
-            alert("追加しました"); //成功
+            alert("更新しました"); //成功
             window.location.reload();
         } else {
-            $("#img1error").append(data);
+            $("#img1error").html(data);
         }
         })
     .fail(function() { //通信エラー
@@ -11673,10 +11457,10 @@ $(function () {
     .done(function(data) {
         // console.log(results);
     if (data === true) {
-        alert("追加しました"); //成功
+        alert("更新しました"); //成功
         window.location.reload();
     } else {
-        $("#img2error").append(data);
+        $("#img2error").html(data);
     }
     })
     .fail(function() { //通信エラー
@@ -11781,18 +11565,19 @@ $(function () {
   });
 
 
-  $('#rog_display').on('click', function () {
+  $('#log_display').on('click', function () {
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    var val = document.getElementsByClassName("rog_list")[0].value;
+    var val = document.getElementsByClassName("log_list")[0].value;
     var word = $('#word').val();
     var firstday = $('#firstday').val();
     var finalday = $('#finalday').val();
     var firsttime = $('#firsttime').val();
     var finaltime = $('#finaltime').val();
+    var dispnum = $('#dispnum').val();
 
     if (firsttime == '') {
         var firsttime = '00:00';
@@ -11805,57 +11590,38 @@ $(function () {
     var day1 = firstday + ' ' + firsttime + ':00';
     var day2 = finalday + ' ' + finaltime + ':00';
 
-    // console.log(word);
-    // console.log(day1);
-    // console.log(day2);
         $.ajax({
         url: '/logserch',
-        type: 'POST',
+        type: 'get',
         datatype: 'json',
-        data: {'val' : val, 'word' : word, 'day1' : day1, 'day2' : day2}
+        data: {'val' : val, 'word' : word, 'day1' : day1, 'day2' : day2, 'dispnum' : dispnum}
         })
 
         .done(function(results) {
             // console.log(results);
-            var data = results[0];
-            // var pagenate = results[1];
             var rows = "";
 
-            $.each(data, function(index, value) {
-                rows += "<tr>";
-                rows += "<td>";
-                rows += value.access_time;
-                rows += "</td>";
-                rows += "<td>";
-                rows += value.user_id;
-                rows += "</td>";
-                rows += "<td>";
-                rows += value.ip_address;
-                rows += "</td>";
-                rows += "<td>";
-                rows += value.user_agent.substr(0, 50) + '...';
-                rows += '<button type="button" class="pop">表示</button>'; //反応しない
-                rows += "</td>";
-                rows += "<td>";
-                rows += value.session_id;
-                rows += "</td>";
-                rows += "<td>";
-                rows += value.access_url;
-                rows += "</td>";
-                rows += "<td>";
-                rows += value.operation;
-                rows += "</td>";
-                rows += "</tr>";
-            })
-            // console.log(rows);
-
-            //テーブルに作成したhtmlを追加する
-            $("#loglist").html(rows);
-            // $("#pagenate").append(pagenate);
-
-            if (results.length === 0) {
-            $("#loglist").after('<p>データがありません</p>');
+            if (results['searchlog']['data'].length !== 0) {
+                for (i = 0; i < results['searchlog']['data'].length; i++) {
+                    rows += `<tr><td>${ results['searchlog']['data'][i].access_time }</td>`
+                    rows += `<td>${ results['searchlog']['data'][i].user_id }</td>`
+                    rows += `<td>${ results['searchlog']['data'][i].ip_address }</td>`
+                    rows += `<td class="part">${ results['searchlog']['data'][i].user_agent.substr(0, 50) + '...' }</td>`
+                    rows += `<td class="full" style="display:none">${ results['searchlog']['data'][i].user_agent }</td>`
+                    rows += `<td>${ results['searchlog']['data'][i].session_id }</td>`
+                    rows += `<td>${ results['searchlog']['data'][i].access_url }</td>`
+                    rows += `<td>${ results['searchlog']['data'][i].operation }</td></tr>`
+                }
+            } else {
+                $("#loglist").after('<p>データがありません</p>');
             }
+
+            $("#loglist").html(rows);
+            $("input[name='log_list']").val(results['val']);
+            $("input[name='word']").val(results['word']);
+            $("input[name='day1']").val(results['day1']);
+            $("input[name='day2']").val(results['day2']);
+            // $("#log_get").dialog("close");
         })
 
         .fail(function() {
@@ -11871,7 +11637,7 @@ $(function () {
         }
     });
     var empno = $(this).attr('value');
-    // console.log(deptid);
+
     var deleteConfirm = confirm('画像を削除してよろしいでしょうか？');
 
     if(deleteConfirm == true) {
@@ -11907,11 +11673,6 @@ $(function () {
     var firsttime1 = $('#firsttime1').val();
     var firsttime2 = $('#firsttime2').val();
     var finaltime2 = $('#finaltime2').val();
-
-    // console.log(number1or2);
-    // console.log(firsttime1);
-    // console.log(firsttime2);
-    // console.log(finaltime2);
 
     if (number1or2 == 1) {
         var time1 = firsttime1;
@@ -12051,9 +11812,218 @@ $(function () {
     });
   });
 
+
+  $('#ename').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var ename = $('#enameset').val();
+
+        var enameConfirm = confirm('名前を' + ename + 'に変更しますか？');
+
+        if(enameConfirm == true) {
+        } else {
+            return false;
+        };
+
+        $.ajax({
+        url: '/enamechange',
+        type: 'POST',
+        datatype: 'json',
+        data: {'ename' : ename}
+        })
+
+        .done(function(data) {
+            alert("更新しました");
+            window.location.reload();
+        })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+        });
+  });
+
+
+  $('#email').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var email = $('#emailset').val();
+
+        var emailConfirm = confirm('メールアドレスを\n' + email + 'に変更しますか？');
+
+        if(emailConfirm == true) {
+        } else {
+            return false;
+        };
+
+        $.ajax({
+        url: '/emailchange',
+        type: 'POST',
+        datatype: 'json',
+        data: {'email' : email}
+        })
+
+        .done(function(data) {
+            if (!data.message) {
+                alert("更新しました");
+                window.location.reload();
+            } else {
+                $("#emailerror").append(data.message);
+            }
+        })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+        });
+  });
+
+  $('#address').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+        //郵便番号を入力するテキストフィールドから値を取得
+        const zip = $('#zip').val();
+
+        $.ajax({
+        url: '/address/{zip}',
+        type: 'POST',
+        datatype: 'json',
+        data: {'zip' : zip}
+        })
+
+        .done(function(data) {
+            if (!data.message) {
+                var addresslist = new Array();
+                for (let i = 0; i < data.length; i++) {
+                    addresslist += "<option value='" + data[i].zip + "：" + data[i].pref + data[i].city + data[i].town;
+                    addresslist += "'>" + data[i].zip + "：" + data[i].pref + data[i].city + data[i].town + "</option>";
+                    $('#getaddress').html(addresslist);
+                }
+            } else {
+                alert(data.message);
+            }
+
+        })
+
+        .fail(function() {
+        alert("エラーが発生しました");
+        });
+  });
+
+  $('#sortnum').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+        var numlist = $("#list-ids").val();
+        var listsortnum = $("#listsortnum").val();
+        // console.log(listsortnum);
+        if (listsortnum === "true") {
+            $.ajax({
+                url: '/numsortchange',
+                type: 'POST',
+                datatype: 'json',
+                data: {'numlist' : numlist}
+                })
+
+                .done(function(data) {
+                    alert("更新しました");
+                    window.location.reload();
+                })
+
+                .fail(function() {
+                alert("エラーが発生しました");
+                });
+        } else {
+            alert("全件表示をしてください。");
+        }
+  });
+
+  $('#editaddress').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+        // var zip = $('#zip').val();
+        var address = $('#getaddress').val();
+        var zip = address.substr(0, address.indexOf('：'))
+        var address1 = address.substr(address.indexOf('：') + 1)
+        var address2 = $('#address2').val();
+
+        // console.log(address);
+        // console.log(zip);
+        // console.log(address1);
+
+        if (zip) {
+            $.ajax({
+                url: '/addresschange',
+                type: 'POST',
+                datatype: 'json',
+                data: {'zip' : zip,
+                       'address1' : address1,
+                       'address2' : address2}
+            })
+
+            .done(function(data) {
+                alert("更新しました");
+                window.location.reload();
+            })
+
+            .fail(function() {
+            alert("エラーが発生しました");
+            });
+        } else {
+            $("#err_zip").append("<p><i class=\"fa fa-exclamation-triangle\"></i>郵便番号を入力してください。</p>");
+        }
+  });
+
+  $('#editphone').on('click', function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+        var phone = $('#tel').val();
+
+        if(phone) {
+            $.ajax({
+                url: '/phonechange',
+                type: 'POST',
+                datatype: 'json',
+                data: {'phone' : phone}
+            })
+
+            .done(function(data) {
+                alert("更新しました");
+                window.location.reload();
+            })
+
+            .fail(function() {
+            alert("エラーが発生しました");
+            });
+        } else {
+            $("#err_tel").append("<p><i class=\"fa fa-exclamation-triangle\"></i>電話番号を入力してください。</p>");
+        }
+
+  });
+
+
+
+
+
+
+
+
 });
-
-
 })();
 
 /******/ })()

@@ -10,54 +10,26 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\TestMail;
+use App\Models\Emp;
+use App\Models\UserLog;
 
 class TestController extends Controller
 {
 
-    // public function dashboard()
-    // {
-    //     $user = Auth::user()->id;
-
-    //     $role_data = DB::table('emp')
-    //         ->select('authority_id')
-    //         ->join('roles', 'emp.role', '=', 'roles.id')
-    //         ->join('authority_role', 'roles.id', '=', 'role_id')
-    //         ->where('empno', '=', $user)->get();
-
-    //     $encode = json_decode(json_encode($role_data), true);
-    //     $array = Arr::flatten($encode);
-
-    //     $data = ['array' => $array];
-    //     return view('dashboard', $data);
-    // }
-
     public function list1(Request $req)
     {
-        //ログインユーザーのid取得
-        $user = Auth::user()->id;
-        //ログインユーザーの役割と権限を取得
-        $role_data = DB::table('emp')
-            ->select('authority_id', 'roles.name')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-        //多次元配列になったstdClassをArrayにキャスト
-        $encode = json_decode(json_encode($role_data), true);
-        //多次元配列を一次元配列に変換
-        $array = Arr::flatten($encode);
-        //ログインユーザーの役割のみ取得
-        $roles_name = $encode[0]['name'];
+        $array = $req->array;
+        $roles_name = $req->roles_name;
+
         //一次元配列の中に特定の値(1:顧客閲覧)があるか判定
         if (in_array(1, $array)) {
             $dispnum = 5;
             $sort = 'asc';
 
-            if (!$req->category) {
-                $category = 'id';
-            } else {
+            if ($req->category) {
                 $category = $req->category;
+            } else {
+                $category = 'id';
             }
 
 
@@ -104,7 +76,7 @@ class TestController extends Controller
                 if ($req->dispnum) {
                     $dispnum = $req->dispnum;
                 }
-            } else if($sort === '▲') {
+            } else {
                 $sort = 'asc';
                 if ($req->dispnum) {
                     $dispnum = $req->dispnum;
@@ -115,9 +87,6 @@ class TestController extends Controller
                 $sort = $req->sorton;
             }
 
-            // print_r($dispnum);
-            // print_r($sort);
-            // print_r($category);
 
             // $members = DB::table('emp')->orderby($category, $sort)->paginate($dispnum);
 
@@ -126,10 +95,10 @@ class TestController extends Controller
             ->join('roles', 'emp.role', '=', 'roles.id')
             ->orderby($category, $sort)->paginate($dispnum);
 
-            $data = ['members' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array, 'roles_name' => $roles_name];
-            // // print_r($data);
-            return view('list1', $data);
+            $droplist = DB::table('dept')->select('deptno', 'dname', 'sort')->orderby('sort', 'asc')->get();
 
+            $data = ['members' => $members, 'droplist' => $droplist, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array, 'roles_name' => $roles_name];
+            return view('list1', $data);
         } else {
             return view('dashboard');
         }
@@ -137,16 +106,7 @@ class TestController extends Controller
 
     public function edit1(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(2, $array)) {
             $editdata = DB::table('emp')->where('id', $req->edid)->update([
@@ -160,8 +120,6 @@ class TestController extends Controller
                 'comm' => $req->ed8,
                 'deptno' => $req->ed9
             ]);
-            // $data = ['title' => '編集', 'members' => $members];
-            // print_r($data);
             return response()->json($editdata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -169,95 +127,24 @@ class TestController extends Controller
         }
     }
 
-    public function editcheck1(Request $req)
-    {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
-
-        if (in_array(2, $array)) {
-            $editlist = array($req->editid, $req->editempno, $req->editename, $req->editjob, $req->editmgr, $req->edithiredate, $req->editsal, $req->editcomm, $req->editdeptno);
-
-            $editcheckdata = $editlist;
-            return response()->json($editcheckdata);
-        } else {
-            $data = ['alert_message' => '不正な通信です'];
-            return response()->json($data);
-        }
-    }
-
-    public function edit1_2(Request $req)
-    {
-        $empno2 = $req->empno2;
-        $user_id = $req->user_id;
-        $empno = $req->empno;
-        $ename = $req->ename;
-        $job = $req->job;
-        $mgr = $req->mgr;
-        $hiredate = $req->hiredate;
-        $sal = $req->sal;
-        $comm = $req->comm;
-        $deptno = $req->deptno;
-
-        DB::table('emp')->where('empno', $empno2)->update([
-            'id' => $user_id,
-            'empno' => $empno,
-            'ename' => $ename,
-            'job' => $job,
-            'mgr' => $mgr,
-            'hiredate' => $hiredate,
-            'sal' => $sal,
-            'comm' => $comm,
-            'deptno' => $deptno
-        ]);
-
-        return view('edit1_2',);
-    }
-
     public function insert1(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(2, $array)) {
-            $user_id = $req->insid;
-            $empno = $req->insempno;
-            $ename = $req->insename;
-            $job = $req->insjob;
-            $mgr = $req->insmgr;
-            $hiredate = $req->inshiredate;
-            $sal = $req->inssal;
-            $comm = $req->inscomm;
             $deptno = $req->insdeptno;
 
             $insertdata = DB::table('emp')->insert([
-                            'id' => $user_id,
-                            'empno' => $empno,
-                            'ename' => $ename,
-                            'job' => $job,
-                            'mgr' => $mgr,
-                            'hiredate' => $hiredate,
-                            'sal' => $sal,
-                            'comm' => $comm,
+                            'id' => $req->insid,
+                            'empno' => $req->insempno,
+                            'ename' => $req->insename,
+                            'job' => $req->insjob,
+                            'mgr' => $req->insmgr,
+                            'hiredate' => $req->inshiredate,
+                            'sal' => $req->inssal,
+                            'comm' => $req->inscomm,
                             'deptno' => $deptno,
                         ]);
-            // $data = ['title' => '追加確認', 'members' => $members];
-            // print_r($data);
             return response()->json($insertdata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -265,51 +152,12 @@ class TestController extends Controller
         }
     }
 
-
-    public function insert1_2(Request $req)
-    {
-        $user_id = $req->user_id;
-        $empno = $req->empno;
-        $ename = $req->ename;
-        $job = $req->job;
-        $mgr = $req->mgr;
-        $hiredate = $req->hiredate;
-        $sal = $req->sal;
-        $comm = $req->comm;
-        $deptno = $req->deptno;
-
-        DB::table('emp')->insert([
-            'id' => $user_id,
-            'empno' => $empno,
-            'ename' => $ename,
-            'job' => $job,
-            'mgr' => $mgr,
-            'hiredate' => $hiredate,
-            'sal' => $sal,
-            'comm' => $comm,
-            'deptno' => $deptno
-        ]);
-
-        return view('insert1_2',);
-    }
-
     public function delete1(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(2, $array)) {
             $deletedata = DB::table('emp')->where('empno', $req->empno)->delete();
-            // $data = ['title' => '削除確認', 'members' => $members];
-            // print_r($data);
             return response()->json($deletedata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -317,37 +165,19 @@ class TestController extends Controller
         }
     }
 
-    public function delete1_2(Request $req)
-    {
-        $empno = $req->empno;
-
-        DB::table('emp')->where('empno', $empno)->delete();
-
-        return view('delete1_2',);
-    }
-
     public function list2(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(3, $array)) {
             $dispnum = 3;
             $sort = 'asc';
 
 
-            if (!$req->category) {
-                $category = 'deptno';
-            } else {
+            if ($req->category) {
                 $category = $req->category;
+            } else {
+                $category = 'deptno';
             }
 
 
@@ -362,6 +192,10 @@ class TestController extends Controller
             if ($req->sortloc) {
                 $sort = $req->sortloc;
                 $category = 'loc';
+            }
+            if ($req->sortnum) {
+                $sort = $req->sortnum;
+                $category = 'sort';
             }
 
 
@@ -381,13 +215,16 @@ class TestController extends Controller
                 $sort = $req->sorton;
             }
 
-            // print_r($dispnum);
-            // print_r($sort);
-            // print_r($category);
-
             $members = DB::table('dept')->orderby($category, $sort)->paginate($dispnum);
-            $data = ['depte' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array];
-            // print_r($data);
+
+            $num = $members->total();
+            if ($num <= $dispnum) {
+                $listsortnum = "true";
+            } else {
+                $listsortnum = "false";
+            }
+
+            $data = ['depte' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array, 'listsortnum' => $listsortnum];
             return view('list2', $data);
 
         } else {
@@ -397,24 +234,15 @@ class TestController extends Controller
 
     public function edit2(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(4, $array)) {
             $editdata = DB::table('dept')->where('deptno', $req->edid)->update([
                         'deptno' => $req->ed1,
                         'dname' => $req->ed2,
                         'loc' => $req->ed3,
+                        'sort' => $req->ed4,
                     ]);
-            // $data = ['title' => '編集', 'dept' => $members];
             return response()->json($editdata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -422,73 +250,23 @@ class TestController extends Controller
         }
     }
 
-    public function editcheck2(Request $req)
-    {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
-
-        if (in_array(4, $array)) {
-            $editlist = array($req->editdeptno, $req->editdname, $req->editloc);
-
-            $editcheckdata = $editlist;
-            return response()->json($editcheckdata);
-        } else {
-            $data = ['alert_message' => '不正な通信です'];
-            return response()->json($data);
-        }
-    }
-
-    public function edit2_2(Request $req)
-    {
-        $deptno2 = $req->deptno2;
-        $deptno = $req->deptno;
-        $dname = $req->dname;
-        $loc = $req->loc;
-
-        DB::table('dept')->where('deptno', $deptno2)->update([
-            'deptno' => $deptno,
-            'dname' => $dname,
-            'loc' => $loc,
-        ]);
-
-        return view('edit2_2',);
-    }
-
     public function insert2(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(4, $array)) {
             $deptno = $req->insdeptno;
             $dname = $req->insdname;
             $loc = $req->insloc;
+            $sort = $req->inssort;
 
             $insertdata = DB::table('dept')->insert([
                             'deptno' => $deptno,
                             'dname' => $dname,
                             'loc' => $loc,
+                            'sort' => $sort,
                         ]);
 
-            // $members = array($deptno, $dname, $loc);
-            // $data = ['title' => '追加確認', 'dept' => $members];
-            // print_r($data);
             return response()->json($insertdata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -496,38 +274,12 @@ class TestController extends Controller
         }
     }
 
-
-    public function insert2_2(Request $req)
-    {
-        $deptno = $req->deptno;
-        $dname = $req->dname;
-        $loc = $req->loc;
-
-        DB::table('dept')->insert([
-            'deptno' => $deptno,
-            'dname' => $dname,
-            'loc' => $loc,
-        ]);
-
-        return view('insert2_2',);
-    }
-
     public function delete2(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(4, $array)) {
             $deletedata = DB::table('dept')->where('deptno', $req->deptid)->delete();
-            // $data = ['title' => '部署一覧', 'members' => $members];
             return response()->json($deletedata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -535,48 +287,63 @@ class TestController extends Controller
         }
     }
 
-    public function delete2_2(Request $req)
+    public function search1(Request $req)
     {
-        $deptno = $req->deptno;
+        $array = $req->array;
+        $roles_name = $req->roles_name;
+        $ename = $req->ename;
+        $minnum = $req->minnum;
+        $maxnum = $req->maxnum;
+        $dispnum = $req->dispnum;
 
-        DB::table('dept')->where('deptno', $deptno)->delete();
+        // $searchdata = DB::table('emp')->select('*')->where('ename', 'like', "%$req->ename%")
+        //                                            ->where('sal', '>=', $req->minnum)
+        //                                            ->where('sal', '<=', $req->maxnum)->get();
 
-        return view('delete2_2',);
-    }
+        $searchdata = Emp::
+            select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->where('ename', 'like', "%$ename%")
+            ->where('sal', '>=', $minnum)
+            ->where('sal', '<=', $maxnum)->paginate($dispnum);
 
-    public function enamesearch(Request $req)
-    {
-        $searchdata = DB::table('emp')->select('*')->where('ename', 'like', "%$req->ename%")->get();
-        // $data = ['title' => '検索結果', 'members' => $members];
-        // print_r($data);
-        return response()->json($searchdata);
-    }
+        $pager_link = $searchdata->appends(request()->query())->links();
 
-    public function salsearch(Request $req)
-    {
-        $searchdata = DB::table('emp')->select('*')->where('sal', '>=', $req->minnum)->where('sal', '<=', $req->maxnum)->get();
-        // $data = ['title' => '検索結果', 'members' => $members];
-        // print_r($data);
-        return response()->json($searchdata);
+        $dataArray = ['pager_link' => $pager_link, 'searchdata' => $searchdata, 'array' => $array, 'roles_name' => $roles_name, 'ename' => $ename, 'minnum' => $minnum, 'maxnum' => $maxnum];
+        // $dataArray = ['searchdata' => $searchdata, 'array' => $array, 'roles_name' => $roles_name, 'ename' => $ename, 'minnum' => $minnum, 'maxnum' => $maxnum];
+        return response()->json($dataArray);
     }
 
     public function dnamesearch(Request $req)
     {
-        $searchdata = DB::table('dept')->select('*')->where('dname', 'like', "%$req->dname%")->get();
+        $array = $req->array;
+        $dname = $req->dname;
+        $dispnum = $req->dispnum;
 
-        // $data = ['title' => '検索結果', 'dept' => $members];
-        // print_r($data);
-        return response()->json($searchdata);
+        $searchdata = DB::table('dept')->select('*')->where('dname', 'like', "%$dname%")->paginate($dispnum);
+
+        $num = $searchdata->total();
+        if ($num <= $dispnum) {
+            $listsortnum = "true";
+        } else {
+            $listsortnum = "false";
+        }
+    // $pager = DB::table('dept')->select('*')->where('dname', 'like', "%$req->dname%")->paginate(3);
+        // $pager_link = $pager->appends(request()->query())->links();
+
+        $dataArray = ['searchdata' => $searchdata, 'array' => $array, 'dname' => $dname, 'listsortnum' => $listsortnum];
+
+        return response()->json($dataArray);
     }
 
     public function empcsvd(Request $req) {
-        $data = $req->enamesearch;
-        $min = $req->minsearch;
-        $max = $req->maxsearch;
+        $data = $req->enames;
+        $min = $req->mins;
+        $max = $req->maxs;
 
         if($data) {
             return response()->streamDownload(
-                function () use($data) {
+                function () use($data, $min, $max) {
                     // 出力バッファをopen
                     $stream = fopen('php://output', 'w');
                     // 文字コードをShift-JISに変換
@@ -593,9 +360,12 @@ class TestController extends Controller
                     'sal',
                     'comm',
                     'deptno',
+                    'role',
                 ]);
                 // データ
-                $csv =DB::table('emp')->select('*')->where('ename', 'like', '%'.$data.'%')->get();
+                $csv =DB::table('emp')->select('*')->where('ename', 'like', '%'.$data.'%')
+                                                   ->where('sal', '>=', $min)
+                                                   ->where('sal', '<=', $max)->get();
                 foreach ($csv as $emp) {
                     fputcsv($stream, [
                         $emp->id,
@@ -607,6 +377,7 @@ class TestController extends Controller
                         $emp->sal,
                         $emp->comm,
                         $emp->deptno,
+                        $emp->role,
                     ]);
                 }
                 fclose($stream);
@@ -616,7 +387,7 @@ class TestController extends Controller
                     'Content-Type' => 'application/octet-stream',
                 ]
             );
-        } else if ($min && $max) {
+        } else if ($min){
             return response()->streamDownload(
                 function () use($min, $max) {
                     // 出力バッファをopen
@@ -635,6 +406,7 @@ class TestController extends Controller
                     'sal',
                     'comm',
                     'deptno',
+                    'role',
                 ]);
                 // データ
                 $csv =DB::table('emp')->select('*')->where('sal', '>=', $min)->where('sal', '<=', $max)->get();
@@ -649,90 +421,7 @@ class TestController extends Controller
                         $emp->sal,
                         $emp->comm,
                         $emp->deptno,
-                    ]);
-                }
-                fclose($stream);
-                },
-                'emp.csv',
-                [
-                    'Content-Type' => 'application/octet-stream',
-                ]
-            );
-        } else if ($min && !$max) {
-            return response()->streamDownload(
-                function () use($min) {
-                    // 出力バッファをopen
-                    $stream = fopen('php://output', 'w');
-                    // 文字コードをShift-JISに変換
-                    stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
-
-                // ヘッダー
-                fputcsv($stream, [
-                    'id',
-                    'empno',
-                    'ename',
-                    'job',
-                    'mgr',
-                    'hiredate',
-                    'sal',
-                    'comm',
-                    'deptno',
-                ]);
-                // データ
-                $csv =DB::table('emp')->select('*')->where('sal', '>=', $min)->get();
-                foreach ($csv as $emp) {
-                    fputcsv($stream, [
-                        $emp->id,
-                        $emp->empno,
-                        $emp->ename,
-                        $emp->job,
-                        $emp->mgr,
-                        $emp->hiredate,
-                        $emp->sal,
-                        $emp->comm,
-                        $emp->deptno,
-                    ]);
-                }
-                fclose($stream);
-                },
-                'emp.csv',
-                [
-                    'Content-Type' => 'application/octet-stream',
-                ]
-            );
-        } else if (!$min && $max) {
-            return response()->streamDownload(
-                function () use($max) {
-                    // 出力バッファをopen
-                    $stream = fopen('php://output', 'w');
-                    // 文字コードをShift-JISに変換
-                    stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
-
-                // ヘッダー
-                fputcsv($stream, [
-                    'id',
-                    'empno',
-                    'ename',
-                    'job',
-                    'mgr',
-                    'hiredate',
-                    'sal',
-                    'comm',
-                    'deptno',
-                ]);
-                // データ
-                $csv =DB::table('emp')->select('*')->where('sal', '<=', $max)->get();
-                foreach ($csv as $emp) {
-                    fputcsv($stream, [
-                        $emp->id,
-                        $emp->empno,
-                        $emp->ename,
-                        $emp->job,
-                        $emp->mgr,
-                        $emp->hiredate,
-                        $emp->sal,
-                        $emp->comm,
-                        $emp->deptno,
+                        $emp->role,
                     ]);
                 }
                 fclose($stream);
@@ -761,6 +450,7 @@ class TestController extends Controller
                         'sal',
                         'comm',
                         'deptno',
+                        'role',
                     ]);
                     // データ
                     $csv =DB::table('emp')->get();
@@ -775,6 +465,7 @@ class TestController extends Controller
                             $emp->sal,
                             $emp->comm,
                             $emp->deptno,
+                            $emp->role,
                         ]);
                     }
                     fclose($stream);
@@ -816,6 +507,7 @@ class TestController extends Controller
                 $sal = mb_convert_encoding($row[6], 'UTF-8', 'SJIS');
                 $comm = mb_convert_encoding($row[7], 'UTF-8', 'SJIS');
                 $deptno = mb_convert_encoding($row[8], 'UTF-8', 'SJIS');
+                $role = mb_convert_encoding($row[9], 'UTF-8', 'SJIS');
 
                 if (isset($id) && preg_match("/^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$/", $id)) { //issetで値が空でないか、また、preg_matchで正規表現チェック
                 } else {
@@ -931,7 +623,7 @@ class TestController extends Controller
                 $sal = mb_convert_encoding($row[6], 'UTF-8', 'SJIS');
                 $comm = mb_convert_encoding($row[7], 'UTF-8', 'SJIS');
                 $deptno = mb_convert_encoding($row[8], 'UTF-8', 'SJIS');
-
+                $role = mb_convert_encoding($row[9], 'UTF-8', 'SJIS');
 
                 for ($i = 0; $i < $num; $i++) {
                     if ($check[$i] == $empno) {
@@ -946,6 +638,7 @@ class TestController extends Controller
                             'sal' => $sal,
                             'comm' => $comm,
                             'deptno' => $deptno,
+                            'role' => $role,
                         ]);
                         break;
                     } else if ($check[$i] > $empno) {
@@ -960,6 +653,7 @@ class TestController extends Controller
                             'sal' => $sal,
                             'comm' => $comm,
                             'deptno' => $deptno,
+                            'role' => $role,
                         ]);
                         break;
                     } else if ($check[$num-1] < $empno) {
@@ -974,6 +668,7 @@ class TestController extends Controller
                             'sal' => $sal,
                             'comm' => $comm,
                             'deptno' => $deptno,
+                            'role' => $role,
                         ]);
                         break;
                     }
@@ -987,8 +682,7 @@ class TestController extends Controller
     }
 
     public function deptcsvd(Request $req) {
-            $data = $req->dnamesearch;
-            // print_r($data);
+            $data = $req->dnames;
 
     if($data) {
         return response()->streamDownload(
@@ -1003,6 +697,7 @@ class TestController extends Controller
                     'deptno',
                     'dname',
                     'loc',
+                    'sort',
                 ]);
                 // データ
                 $csv =DB::table('dept')->select('*')->where('dname', 'like', '%'.$data.'%')->get();
@@ -1011,6 +706,7 @@ class TestController extends Controller
                         $dept->deptno,
                         $dept->dname,
                         $dept->loc,
+                        $dept->sort,
                     ]);
                 }
                 fclose($stream);
@@ -1033,6 +729,7 @@ class TestController extends Controller
                     'deptno',
                     'dname',
                     'loc',
+                    'sort',
                 ]);
                 // データ
                 $csv =DB::table('dept')->get();
@@ -1041,6 +738,7 @@ class TestController extends Controller
                         $dept->deptno,
                         $dept->dname,
                         $dept->loc,
+                        $dept->sort,
                     ]);
                 }
                 fclose($stream);
@@ -1076,6 +774,7 @@ class TestController extends Controller
                 $deptno = mb_convert_encoding($row[0], 'UTF-8', 'SJIS');
                 $dname = mb_convert_encoding($row[1], 'UTF-8', 'SJIS');
                 $loc = mb_convert_encoding($row[2], 'UTF-8', 'SJIS');
+                $sort = mb_convert_encoding($row[3], 'UTF-8', 'SJIS');
 
 
                 if (isset($deptno) && preg_match("/^[1-9][0-9]$/", $deptno)) { //issetで値が空でないか、また、preg_matchで正規表現チェック
@@ -1103,6 +802,12 @@ class TestController extends Controller
                     $valB[] = $row_count;
                 }
 
+                if (is_string($sort)) {
+                } else {
+                    $so = 'sort:'.$sort;
+                    $valA[] = $so;
+                    $valB[] = $row_count;
+                }
             }
             $row_count++;
         }
@@ -1136,6 +841,7 @@ class TestController extends Controller
                 $deptno = mb_convert_encoding($row[0], 'UTF-8', 'SJIS');
                 $dname = mb_convert_encoding($row[1], 'UTF-8', 'SJIS');
                 $loc = mb_convert_encoding($row[2], 'UTF-8', 'SJIS');
+                $sort = mb_convert_encoding($row[3], 'UTF-8', 'SJIS');
 
 
                 for ($i = 0; $i < $num; $i++) {
@@ -1145,6 +851,7 @@ class TestController extends Controller
                             'deptno' => $deptno,
                             'dname' => $dname,
                             'loc' => $loc,
+                            'sort' => $sort,
                         ]);
                         break;
                     } else if ($check[$i] > $deptno) {
@@ -1153,6 +860,7 @@ class TestController extends Controller
                             'deptno' => $deptno,
                             'dname' => $dname,
                             'loc' => $loc,
+                            'sort' => $sort,
                         ]);
                         break;
                     } else if ($check[$num-1] < $deptno) {
@@ -1161,6 +869,7 @@ class TestController extends Controller
                             'deptno' => $deptno,
                             'dname' => $dname,
                             'loc' => $loc,
+                            'sort' => $sort,
                         ]);
                         break;
                     }
@@ -1183,7 +892,7 @@ class TestController extends Controller
 
         // 拡張子を照合する
         if($file_ext != "jpg" && $file_ext != "gif" && $file_ext != "png"){
-            $resp = 'エラー！<br>ファイルが画像ではありません。<br>対応拡張子(.jpg　.gif　.png)';
+            $resp = 'ファイルが画像ではありません。<br>対応拡張子(.jpg　.gif　.png)';
             return response()->json($resp); //エラー内容を返す
         }
 
@@ -1193,7 +902,7 @@ class TestController extends Controller
 
         //画像サイズ制限
         if ($width_size > 300 || $height_size > 300) {
-            $resp = 'エラー！<br>画像サイズは300×300までです。';
+            $resp = '画像サイズは300x300までです。';
             return response()->json($resp); //エラー内容を返す
         }
 
@@ -1223,7 +932,7 @@ class TestController extends Controller
 
         // 拡張子を照合する
         if($file_ext != "jpg" && $file_ext != "gif" && $file_ext != "png"){
-            $resp = 'エラー！<br>ファイルが画像ではありません。<br>対応拡張子(.jpg　.gif　.png)';
+            $resp = 'ファイルが画像ではありません。<br>対応拡張子(.jpg　.gif　.png)';
             return response()->json($resp); //エラー内容を返す
         }
 
@@ -1233,7 +942,7 @@ class TestController extends Controller
 
         //画像サイズ制限
         if ($width_size > 300 || $height_size > 300) {
-            $resp = 'エラー！<br>画像サイズは300×300までです。';
+            $resp = '画像サイズは300x300までです。';
             return response()->json($resp); //エラー内容を返す
         }
 
@@ -1261,16 +970,7 @@ class TestController extends Controller
 
     public function role_change(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(2, $array)) {
             $change = DB::table('emp')->where('empno', $req->empno)->update(['role' => $req->val]);
@@ -1323,13 +1023,13 @@ class TestController extends Controller
         }
 
 
-        if ($sort === '▼') {
-            $sort = 'desc';
+        if ($sort === '▲') {
+            $sort = 'asc';
             if ($req->dispnum) {
                 $dispnum = $req->dispnum;
             }
-        } else if ($sort === '▲') {
-            $sort = 'asc';
+        } else {
+            $sort = 'desc';
             if ($req->dispnum) {
                 $dispnum = $req->dispnum;
             }
@@ -1339,39 +1039,52 @@ class TestController extends Controller
             $sort = $req->sorton;
         }
 
-        $logger = DB::table('user_logs')
-        ->select('user_id', 'ip_address', 'user_agent', 'session_id', 'access_url', 'operation', 'access_time')
-        ->orderby($category, $sort)->paginate($dispnum);
+        $logger = UserLog::select('user_id', 'ip_address', 'user_agent', 'session_id', 'access_url', 'operation', 'access_time')
+                            ->orderby($category, $sort)->paginate($dispnum);
 
         $data = ['logger' => $logger, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category];
-        // print_r($data);
         return view('log', $data);
-
     }
 
     public function logserch(Request $req)
     {
-        if (!empty($req->word)) {
-            $searchlog = DB::table('user_logs')->select(
+        $val = $req->val;
+        $word = $req->word;
+        $day1 = $req->day1;
+        $day2 = $req->day2;
+        $dispnum = $req->dispnum;
+
+        if (!empty($word)) {
+            // $searchlog = UserLog::select(
+            //     'user_id', 'ip_address', 'user_agent', 'session_id',
+            //     'access_url', 'operation', 'access_time')
+            //     ->where($val, 'like', "%$word%")->orderby('access_time', 'desc')->get();
+            $searchlog = UserLog::select(
                 'user_id', 'ip_address', 'user_agent', 'session_id',
                 'access_url', 'operation', 'access_time')
-                ->where($req->val, 'like', "%$req->word%")->orderby('access_time', 'desc')->get();
-            $pager = DB::table('user_logs')->select(
-                'user_id', 'ip_address', 'user_agent', 'session_id',
-                'access_url', 'operation', 'access_time')
-                ->where($req->val, 'like', "%$req->word%")->orderby('access_time', 'desc')->paginate(10);
-            // $pager_link = $pager->appends(request()->query())->links('pagination::bootstrap-4');
-            $dataArray = [$searchlog];
-                return response()->json($dataArray);
+                ->where($val, 'like', "%$word%")->orderby('access_time', 'desc')->paginate($dispnum);
+            $pager_link = $searchlog->appends(request()->query())->links();
+            $dataArray = ['searchlog' => $searchlog, 'val' => $val, 'word' => $word, 'day1' => $day1, 'day2' => $day2];
+            // $dataArray = [$searchlog];
+            return response()->json($dataArray);
         } else {
-            $searchlog = DB::select("select * from user_logs where access_time between '$req->day1' and '$req->day2'");
-            return response()->json($searchlog);
+            $searchlog = DB::table('user_logs')->select('*')
+                                               ->where('access_time', '>=', $day1)
+                                               ->where('access_time', '<=', $day2)->paginate($dispnum);
+                $dataArray = ['searchlog' => $searchlog, 'val' => $val, 'word' => $word, 'day1' => $day1, 'day2' => $day2];
+            return response()->json($dataArray);
         }
     }
 
     public function logcsvd(Request $req) {
+        $log_list = $req->log_list;
+        $word = $req->word;
+        $day1 = $req->day1;
+        $day2 = $req->day2;
+
+        if($log_list === 'access_time') {
         return response()->streamDownload(
-            function () {
+            function () use($day1, $day2) {
                 // 出力バッファをopen
                 $stream = fopen('php://output', 'w');
                 // 文字コードをShift-JISに変換
@@ -1388,7 +1101,8 @@ class TestController extends Controller
                     'operation',
                 ]);
                 // データ
-                $csv =DB::table('user_logs')->get();
+                $csv =DB::table('user_logs')->select('*')->where('access_time', '>=', $day1)
+                                                         ->where('access_time', '<=', $day2)->get();
                 foreach ($csv as $log) {
                     fputcsv($stream, [
                         $log->access_time,
@@ -1407,6 +1121,50 @@ class TestController extends Controller
                 'Content-Type' => 'application/octet-stream',
             ]
         );
+        } else {
+            if (empty($log_list)) {
+                $log_list = "user_id";
+                $word = "";
+            }
+
+        return response()->streamDownload(
+            function () use($log_list, $word) {
+                // 出力バッファをopen
+                $stream = fopen('php://output', 'w');
+                // 文字コードをShift-JISに変換
+                stream_filter_prepend($stream,'convert.iconv.utf-8/cp932//TRANSLIT');
+
+                // ヘッダー
+                fputcsv($stream, [
+                    'access_time',
+                    'user_id',
+                    'ip_address',
+                    'user_agent',
+                    'session_id',
+                    'access_url',
+                    'operation',
+                ]);
+                // データ
+                $csv =DB::table('user_logs')->select('*')->where($log_list, 'like', '%'.$word.'%')->get();
+                foreach ($csv as $log) {
+                    fputcsv($stream, [
+                        $log->access_time,
+                        $log->user_id,
+                        $log->ip_address,
+                        $log->user_agent,
+                        $log->session_id,
+                        $log->access_url,
+                        $log->operation,
+                    ]);
+                }
+                fclose($stream);
+            },
+            'log.csv',
+            [
+                'Content-Type' => 'application/octet-stream',
+            ]
+        );
+        }
     }
 
     public static function logdeletion()
@@ -1422,22 +1180,13 @@ class TestController extends Controller
 
     public function schedule(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(5, $array)) {
             $scheduler = DB::table('schedulers')->get();
             $encode2 = json_decode(json_encode($scheduler), true);
             $array2 = Arr::flatten($encode2);
-            // print_r($array2);
+
             $num = $array2[2];
             $interval = $array2[3];
             $interval1 = $array2[4];
@@ -1450,22 +1199,13 @@ class TestController extends Controller
 
             return view('schedule', $data);
         } else {
-            return view('dashboard');
+            return redirect(route('dashboard'));
         }
     }
 
     public function setting1(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(5, $array)) {
             $number1or2 = $req->number1or2;
@@ -1480,7 +1220,7 @@ class TestController extends Controller
                             'interval2' => $time3,
                             'intervalday' => "",
                             'intervalhour' => "",
-                        ]);
+                            ]);
 
             return response()->json($settingdata);
         } else {
@@ -1491,16 +1231,7 @@ class TestController extends Controller
 
     public function setting2(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(5, $array)) {
             $day = $req->day;
@@ -1524,16 +1255,7 @@ class TestController extends Controller
 
     public function setting3(Request $req)
     {
-        $user = Auth::user()->id;
-
-        $role_data = DB::table('emp')
-            ->select('authority_id')
-            ->join('roles', 'emp.role', '=', 'roles.id')
-            ->join('authority_role', 'roles.id', '=', 'role_id')
-            ->where('empno', '=', $user)->get();
-
-        $encode = json_decode(json_encode($role_data), true);
-        $array = Arr::flatten($encode);
+        $array = $req->array;
 
         if (in_array(5, $array)) {
             $settingdata = DB::table('schedulers')->where('name', 'log_delete')->update([
@@ -1547,39 +1269,96 @@ class TestController extends Controller
         }
     }
 
-    public function send(Request $req)
+    public function enamechange(Request $req)
     {
-        $name = 'テスト ユーザー';
-        $email = 'test@example.com';
-
-        Mail::send('mail', [
-            'name' => $name,
-        ], function ($message) use ($email) {
-            $message->to($email)
-                ->subject('テストタイトル');
-        });
-
-        return view('welcome');
+        $enamechange = DB::table('emp')->where('empno', Auth::user()->empno)->update([
+                    'ename' => $req->ename,
+                ]);
+        return response()->json($enamechange);
     }
+
+    public function emailchange(Request $req)
+    {
+        $mail =  DB::table('emp')->select('email')->get();
+        $encode = json_decode(json_encode($mail), true);
+        $array = Arr::flatten($encode);
+
+        if (in_array($req->email, $array)) {
+            $data = ['message' => 'このメールアドレスは既に使用されています'];
+            return response()->json($data);
+        } else {
+            DB::table('emp')->where('empno', Auth::user()->empno)->update([
+                'email' => $req->email,
+            ]);
+            $data = true;
+            return response()->json($data);
+        }
+    }
+
+    public function address(Request $req)
+    {
+        $searchaddress = DB::table('addresses')->select('*')->where('zip', 'like', "$req->zip%")->get();
+        $encode = json_decode(json_encode($searchaddress), true);
+
+        if(empty($encode)) {
+            $searchaddress = ['message' => '存在しない郵便番号です'];
+        }
+        return response()->json($searchaddress);
+    }
+
+    public function numsortchange(Request $req)
+    {
+        $numlist = $req->numlist;
+        $list = explode(',', $numlist);
+        $sort = 1;
+        for($i= 0; $i < count($list); $i++) {
+            DB::table('dept')->where('deptno', $list[$i])->update([
+                'sort' => $sort,
+            ]);
+            $sort++;
+        }
+        $data = true;
+        return response()->json($data);
+    }
+
+    public function addresschange(Request $req)
+    {
+        $data = DB::table('emp')->where('empno', Auth::user()->empno)->update([
+                    'post_code' => $req->zip,
+                    'address1' => $req->address1,
+                    'address2' => $req->address2,
+                ]);
+
+        return response()->json($data);
+    }
+
+    public function phonechange(Request $req)
+    {
+        $data = DB::table('emp')->where('empno', Auth::user()->empno)->update([
+                    'phone_number' => $req->phone,
+                ]);
+
+        return response()->json($data);
+    }
+
 
 
 
 
     public function aaa(Request $req)
     {
+        $members = DB::table('dept')->orderby('deptno', 'asc')->paginate(5);
 
-        $user = Auth::user();
-        // $user2 = (int)('6001tanaka');
+        $searchlog = UserLog::select(
+            'user_id', 'ip_address', 'user_agent', 'session_id',
+            'access_url', 'operation', 'access_time')
+            ->orderby('access_time', 'desc')->paginate(10);
 
-        // $role_data = DB::table('emp')
-        //     ->select('authority_id', 'roles.name')
-        //     ->join('roles', 'emp.role', '=', 'roles.id')
-        //     ->join('authority_role', 'roles.id', '=', 'role_id')
-        //     ->where('empno', '=', $user)->get();
+        // $num =count($members['total']);
 
-        // $encode = json_decode(json_encode($role_data), true);
-        // $array = Arr::flatten($encode);
-         echo($user);
-        //  echo($user2);
+        print_r($searchlog->total());
+        dd($searchlog);
+        // $user = Auth::user();
+        //  echo($user);
     }
 }

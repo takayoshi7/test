@@ -15,11 +15,11 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
-            <!-- Email Address -->
+            <!-- ID -->
             <div>
                 <x-label for="id" :value="__('ID')" />
 
-                <x-input id="id" class="block mt-1 w-full" type="id" name="id" :value="old('id')" required autofocus />
+                <x-input id="id" class="block mt-1 w-full" type="text" name="id" :value="old('id')" required autofocus />
             </div>
 
             <!-- Password -->
@@ -35,7 +35,7 @@
             <!-- Remember Me -->
             <div class="block mt-4">
                 <label for="remember_me" class="inline-flex items-center">
-                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
+                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember" checked>
                     <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                 </label>
             </div>

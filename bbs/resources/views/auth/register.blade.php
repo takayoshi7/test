@@ -14,14 +14,14 @@
 
             <!-- ID -->
             <div>
-                <x-label for="id" :value="__('ID')" />
+                <x-label for="id" :value="__('ID ※半角英数字のみ')" />
 
                 <x-input id="id" class="block mt-1 w-full" type="text" name="id" :value="old('id')" required autofocus />
             </div>
 
             <!-- ename -->
             <div>
-                <x-label for="empno" :value="__('empno')" />
+                <x-label for="empno" :value="__('empno ※半角数字4桁')" />
 
                 <x-input id="empno" class="block mt-1 w-full" type="text" name="empno" :value="old('empno')" required autofocus />
             </div>
@@ -35,7 +35,7 @@
 
             <!-- Password -->
             <div class="mt-4">
-                <x-label for="password" :value="__('Password')" />
+                <x-label for="password" :value="__('パスワード ※半角英数字のみ8桁以上')" />
 
                 <x-input id="password" class="block mt-1 w-full"
                                 type="password"

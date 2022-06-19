@@ -34,10 +34,10 @@ class RegisteredUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id' => ['required', 'string', 'max:20', 'regex:/^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$/'],
-            'empno' => ['required', 'integer', 'regex:/^([1-9][0-9]{3})/'],
+            'id' => ['required', 'string', 'max:20', 'regex:/^[a-zA-Z0-9!-\/:-@¥[-`{_~?]+$/', 'unique:emp'],
+            'empno' => ['required', 'integer', 'regex:/^([1-9][0-9]{3}$)/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:emp'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', 'regex:/^[a-zA-Z0-9!-\/:-@¥[-`{_~?]{8,}+$/', Rules\Password::defaults()],
         ]);
 
         $user = Emp::create([

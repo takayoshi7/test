@@ -1,41 +1,43 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('スケジュール設定') }}
+            {{ __('設定') }}
         </h2>
     </x-slot>
 
-<font size="5">ログ削除</font>
-<br><br>
+<diV class="greeting">
+    <font size="5">ログ削除スケジュール</font>
+</div>
+<br>
 <table>
 <th colspan="3">実行間隔</th>
 <tr>
 <td width="150">
     <P>現在の設定</p><br>
     @if ($num != 0)
-    <p>1日：{{ $num }}回</p><br>
+    <p>1日：<strong>{{ $num }}回</strong></p><br>
     @endif
     @if ($interval != "")
-    <p>実行時間：</p><br><p>{{ $interval }}時</p><br>
+    <p>実行時間：</p><br><p><strong>{{ $interval }}時</strong></p><br>
     @endif
     @if ($interval1 != "")
-    <p>実行時間：</p><br>{{ $interval1 }}時</p><br><p>＆</p><br><p>{{ $interval2 }}時</p><br>
+    <p>実行時間：</p><br><strong>{{ $interval1 }}時</strong></p><p>＆</p><p><strong>{{ $interval2 }}時</strong></p><br>
     @endif
     {{-- @if ($intervalday != "")
     <p>実行期間：</p><br>{{ $intervalday }}日ごと</p><br>
     @endif --}}
     @if ($intervalhour != "")
-    <p>実行期間：</p><br>{{ $intervalhour }}分ごと</p><br>
+    <p>実行期間：</p><br><strong>{{ $intervalhour }}分ごと</strong></p><br>
     @endif
     {{-- @if ($conditions != "")
     <p>{{ $conditions }}</p>
     @endif --}}
 </td>
-<td width="300">
+<td width="300" valign="top">
     <P>１日の回数と時間で選択</p><br>
     <div>
     <dl>
-    <dt class="title">回数</dt>
+    <dt class="numtime">回数(1回or2回)</dt>
     <dd>
     <select id="number1or2" onchange="entryChange2();">
         @foreach (Config::get('number.list') as $key => $val)
@@ -45,7 +47,7 @@
     </dd>
     </dl><br>
     <dl id="timeID3">
-        <dt class="title">時間</dt>
+        <dt class="hour">時間</dt>
         <select id="firsttime1">
             @foreach (Config::get('hours.list') as $key => $val)
                 <option value="{{ $key }}">{{ $val }}</option>
@@ -53,7 +55,7 @@
         </select>
     </dl>
     <dl id="timeID4">
-        <dt class="title">時間</dt>
+        <dt class="hour">時間</dt>
         <select id="firsttime2">
             @foreach (Config::get('hours.list') as $key => $val)
                 <option value="{{ $key }}">{{ $val }}</option>
@@ -69,7 +71,7 @@
     </div>
 </td>
 
-<td width="300">
+<td width="300" valign="top">
     <P>期間で選択</p><br>
     <div>
     {{-- <dl>
@@ -91,7 +93,7 @@
         </select>日ごと
     </dl> --}}
     <dl id="timeID6">
-        <dt class="title">期間</dt>
+        <dt class="period">期間</dt>
         <select id="intervalhour">
             @foreach (Config::get('time.list') as $key => $val)
                 <option value="{{ $key }}">{{ $val }}</option>
@@ -110,14 +112,14 @@
 <tr>
 <td width="150">
     <P>現在の設定</p><br>
-    <p>作成から{{ $conditions }}日</p><br><p>過ぎたら削除</p><br>
+    <p>作成から<br><strong>{{ $conditions }}日</strong><br>過ぎたら削除</p>
 </td>
 <td width="300">
     <select id="conditions">
         @foreach (Config::get('days.list') as $key => $val)
             <option value="{{ $key }}">{{ $val }}</option>
         @endforeach
-    </select>日<br>
+    </select>日<br><br>
     <input type="button" id="setting3" value="設定"><br>
 </td>
 </tr>

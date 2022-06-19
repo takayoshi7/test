@@ -16,10 +16,10 @@ class TestMail extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($name, $email)
     {
-        // $this->name = $name;
-        // $this->email = $email;
+        $this->name = $name;
+        $this->email = $email;
     }
 
     /**
@@ -29,11 +29,13 @@ class TestMail extends Mailable
      */
     public function build()
     {
-        // return $this->to($this->email)
-        //     ->subject('テストタイトル')
-        //     ->view('mail')
-        //     ->with([
-        //         'name' => $this->name,
-        //     ]);
+
+        return $this->to($this->email)
+            ->subject('メールアドレス変更のお知らせ')
+            ->view('mail')
+            ->with([
+                'name' => $this->name,
+                'email' => $this->email,
+            ]);
     }
 }
