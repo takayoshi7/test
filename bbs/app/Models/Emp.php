@@ -24,20 +24,17 @@ class Emp extends Authenticatable implements MustVerifyEmail
      *
      * @var string
      */
-    protected $primaryKey = 'id'; // これを追記
+    // protected $primaryKey = 'id'; // これを追記
 
-    // use HasFactory, ModelHistoryTrait;
+    // 自動増分ではない
+    public $incrementing = false;
+
+    // 主キーが数値型ではない
+    protected $keyType = 'string';
+        // use HasFactory, ModelHistoryTrait;
 
     public function role(){
         return $this->belongsTo('App\Models\Role', 'role', 'id');
-    }
-
-    public function hasRole(String|int $role) {
-        return ($this->role->name == $role) || ($this->role->id == $role);
-    }
-
-    public function hasAuthority(String $authority) {
-        return (bool) $this->role->authorities->where('ename', $authority)->count();
     }
 
 }

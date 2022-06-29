@@ -11,7 +11,6 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         Commands\LogDeletion::class, //起動したいコマンドファイル名
-        Commands\WriteLog::class,
     ];
 
     /**

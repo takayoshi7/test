@@ -17,19 +17,14 @@
             <input type="button" id="search1"  value="検索">
             <input type="submit" id="em"  value="CSVエクスポート">
             <input type="button" id="btn2" value="CSVインポート">
-            <input type="hidden" name="enames">
-            <input type="hidden" name="mins">
-            <input type="hidden" name="maxs">
         </form>
         </div>
         <div class="sort">
         </div>
         <div class="page">
-            <form action="{{ url('/list1') }}" method="get">
+            <form action="{{ url('/list100') }}" method="get">
             @csrf
-            <p>表示件数：<input type="number" name="dispnum" id="dispnum" value={{ $dispnum }} min="1" pattern="^[1-9]+$">
-                        <input type="hidden" name="sorton" value={{ $sort }}>
-                        <input type="hidden" name="category" value={{ $category }}>
+            <p>表示件数：<input type="number" name="dispnum" id="dispnum" value="5" min="1" pattern="^[1-9]+$">
                         <input type="submit" name="submit" value="変更">
             </p>
             </form>
@@ -37,54 +32,45 @@
     </div>
     </x-slot>
 
-<form action="{{ url('/list1') }}" method="get">
+<form action="{{ url('/list100') }}" method="get">
 @csrf
 <table>
     <thead>
     <tr><th>ユーザＩＤ
         <input type="submit" name="sortid" value="▲">
         <input type="submit" name="sortid" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>社員コード
         <input type="submit" name="sortempno" value="▲">
         <input type="submit" name="sortempno" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>社員名
         <input type="submit" name="sortename" value="▲">
         <input type="submit" name="sortename" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>職種
         <input type="submit" name="sortjob" value="▲">
         <input type="submit" name="sortjob" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>上司コード
         <input type="submit" name="sortmgr" value="▲">
         <input type="submit" name="sortmgr" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>入社日
         <input type="submit" name="sorthiredate" value="▲">
         <input type="submit" name="sorthiredate" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>給与
         <input type="submit" name="sortsal" value="▲">
         <input type="submit" name="sortsal" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>comm
         <input type="submit" name="sortcomm" value="▲">
         <input type="submit" name="sortcomm" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>部署コード
         <input type="submit" name="sortdeptno" value="▲">
         <input type="submit" name="sortdeptno" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th width="100">画像1
         </th>
@@ -133,7 +119,7 @@
         </td>
         @if(in_array(2, $array))
         <td><button type="button" class="edit1" value="{{ $member->id }}, {{ $member->empno }}, {{ $member->ename }}, {{ $member->job }}, {{ $member->mgr }}, {{ $member->hiredate }}, {{ $member->sal }}, {{ $member->comm }}, {{ $member->deptno }}" onclick="edit1func(this.value)">編集</button></td>
-        <td><button type="button" class="delete1" value="{{ $member->empno }}">削除</button></td>
+        <td><button type="button" class="delete1" value="{{ $member->empno }}, {{ $member->ename }}" onclick="delete1func(this.value)">削除</button></td>
         @endif
         <td>{{ $member->name }}
         @if($roles_name === '管理者')
@@ -146,9 +132,24 @@
     </tbody>
 </table>
 <br>
-<div id="pager">
-{{ $members->appends(request()->query())->links('pagination::bootstrap-4') }}
-</div>
+
+<ul class="pagination" id="pager">
+    <li class="getPageClass">
+    @for ($i = 0; $i <= $members->lastPage(); $i++)
+    @if ($i == 0)
+    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc({{ $i }})">◁</a>
+    @endif
+    @if ($i >= 1)
+    @if ($i == $members->currentPage())
+    <a class="page-link current{{ $i }} active" onclick="pagefunc({{ $i }})">{{ $i }}</a>
+    @else
+    <a class="page-link current{{ $i }}" onclick="pagefunc({{ $i }})">{{ $i }}</a>
+    @endif
+    @endif
+    @endfor
+    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc({{ $i }})">▷</a>
+    </li>
+</ul>
 
 {{-- 追加ダイアログ --}}
 <div id="insertlist1">
@@ -229,6 +230,15 @@
     <button type="button" id="edit1btn" class="originalhidden">更新</button>
 </div>
 
+{{-- 削除ダイアログ --}}
+<div id="deletelist1">
+    <p>削除してよろしいでしょうか？</p><br>
+    <p>社員コード：<input id="delete_empno" disabled></p>
+    <p>社員名：<input id="delete_ename" disabled></p>
+    <br>
+    <button type="button" id="delete1btn" class="originalhidden">変更</button>
+</div>
+
 {{-- 検索ダイアログ --}}
 <div id="searchlist1">
     <p>社員名で絞り込みができます。</p>
@@ -297,7 +307,7 @@
     @csrf
     <input type="hidden" id="dialog_empno">
     <input type="file" accept="image/*" id="simg2" name="simg2" class="form-control">
-    <br><br>
+    <br>
     <button type="button" id="inimg2" class="originalhidden">アップロード</button>
     <br>
     <div id="img2error"></div>
@@ -348,9 +358,7 @@
         buttons: {
         "追加": function() {
             $('#insert1btn').click();
-            $(this).dialog("close");
         },
-
         "キャンセル": function() {
             $(this).dialog("close");
         },
@@ -384,7 +392,33 @@
         buttons: {
         "更新": function() {
             $('#edit1btn').click();
+        },
+        "キャンセル": function() {
             $(this).dialog("close");
+        },
+        }
+        });
+    });
+
+    function delete1func(value) {
+        var deleteArray = value.split(",");
+        $('#delete_empno').val(deleteArray[0]);
+        $('#delete_ename').val(deleteArray[1]);
+
+        $("#deletelist1").dialog("open");
+        return false;
+    }
+
+    $(function() {
+        $("#deletelist1").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"削除",
+        width: 400,
+        height: 300,
+        buttons: {
+        "削除": function() {
+            $('#delete1btn').click();
         },
         "キャンセル": function() {
             $(this).dialog("close");
@@ -413,7 +447,6 @@
         buttons: {
         "検索": function() {
             $('#search1btn').click();
-            // $(this).dialog("close");
         },
         "キャンセル": function() {
             $(this).dialog("close");
@@ -517,7 +550,6 @@
         buttons: {
         "変更": function() {
             $('#role_change').click();
-            $(this).dialog("close");
         },
         "キャンセル": function() {
             $(this).dialog("close");
@@ -525,6 +557,102 @@
         }
         });
     });
+
+
+    function pagefunc(i) {
+        $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      url: '/list11',
+      type: 'get',
+      datatype: 'json',
+      data: {
+        'i': i
+      }
+    }).done(function (results) {
+        // console.log(results['pagenum']);
+        var rows = "";
+
+        for (var i = 0; i < results['members'].length; i++) {
+        rows += "<tr><td>".concat(results['members'][i].id, "</td>");
+        rows += "<td>".concat(results['members'][i].empno, "</td>");
+        rows += "<td>".concat(results['members'][i].ename, "</td>");
+        rows += "<td>".concat(results['members'][i].job, "</td>");
+        rows += "<td>".concat(results['members'][i].mgr, "</td>");
+        rows += "<td>".concat(results['members'][i].hiredate, "</td>");
+        rows += "<td>".concat(results['members'][i].sal, "</td>");
+        rows += "<td>".concat(results['members'][i].comm, "</td>");
+        rows += "<td>".concat(results['members'][i].deptno, "</td>");
+
+        if (results['members'][i].img1) {
+          rows += "<td><img class=\"listmyimg\" src=\"data:image/png;base64,".concat(results['members'][i].img1, "\" width=\"30px\">");
+        } else {
+          rows += "<td><img class=\"listmyimg\" src=\"storage/img/no_image.jpg\" width=\"30px\">";
+        }
+
+        if (results['array'].includes(2)) {
+          rows += "<button type=\"button\" class=\"img1\" onclick=\"img1func(".concat(results['members'][i].empno, ")\">変更</button></td>");
+        } else {
+          rows += "</td>";
+        }
+
+        if (results['members'][i].img2) {
+          rows += "<td><img class=\"listmyimg\" src=\"storage/img/".concat(results['members'][i].img2, "\" width=\"30px\">");
+        } else {
+          rows += "<td><img class=\"listmyimg\" src=\"storage/img/no_image.jpg\" width=\"30px\">";
+        }
+
+        if (results['array'].includes(2)) {
+          rows += "<button type=\"button\" class=\"img2\" onclick=\"img2func(".concat(results['members'][i].empno, ")\">変更</button></td>");
+        } else {
+          rows += "</td>";
+        }
+
+        if (results['array'].includes(2)) {
+          rows += "<td><button type=\"button\" class=\"edit1\" value=\"".concat(results['members'][i].id, ", ").concat(results['members'][i].empno, ", ").concat(results['members'][i].ename, ", ").concat(results['members'][i].job, ", ").concat(results['members'][i].mgr, ", ").concat(results['members'][i].hiredate, ", ").concat(results['members'][i].sal, ", ").concat(results['members'][i].comm, ", ").concat(results['members'][i].deptno, "\" onclick=\"edit1func(this.value)\">編集</button></td>");
+          rows += "<td><button type=\"button\" class=\"delete1\" value=\"".concat(results['members'][i].empno, ", ").concat(results['members'][i].ename, "\" onclick=\"delete1func(this.value)\">削除</button></td>");
+        }
+
+        rows += "<td>".concat(results['members'][i].name, "<br>");
+
+        if (results['roles_name'] === '管理者') {
+          rows += "<button type=\"button\"  class=\"role1\" onclick=\"roleselect(".concat(results['members'][i].empno, ")\">変更</button></td></tr>");
+        } else {
+          rows += "</td></tr>";
+        }
+      }
+        $("#list1").html(rows);
+
+        var num = document.getElementsByClassName("page-link");
+        for (var i = 0; i < num.length; i++) {
+            if (num[i].innerText != results['pagenum']) {
+                $('.' + 'current' + i).removeClass('active');
+            } else {
+                $('.' + 'current' + i).addClass('active');
+            }
+        }
+
+        if (results['pagenum'] != 1) {
+            $('#prev').show();
+        } else {
+            $('#prev').hide();
+        }
+
+        var last = num.length - 2;
+        if (last == results['pagenum']) {
+            $('#next').hide();
+        } else {
+            $('#next').show();
+        }
+
+    }).fail(function () {
+      alert("エラーが発生しました");
+    });
+  };
 
 
 </script>

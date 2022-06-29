@@ -28,11 +28,6 @@ class LogoutToLog
      */
     public function handle(Logout $event)
     {
-        // logger()->info($event->user);
-        // logger()->info($event->guard);
-        // logger()->info(request()->ip());
-        // logger()->info(request()->userAgent());
-
         UserLog::create(
             [
                 'user_id' => $event->user->id,
@@ -44,6 +39,5 @@ class LogoutToLog
                 'access_time' => \Carbon\Carbon::now()
             ]
         );
-
     }
 }

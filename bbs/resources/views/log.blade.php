@@ -13,20 +13,14 @@
         @csrf
             <input type="submit" id="logserch"  value="絞り込み">
             <input type="submit" value="CSVエクスポート">
-            <input type="hidden" name="log_list">
-            <input type="hidden" name="word">
-            <input type="hidden" name="day1">
-            <input type="hidden" name="day2">
         </form>
         </div>
         <div class="sort">
         </div>
         <div class="page">
-            <form action="{{ url('/log') }}" method="get">
+            <form action="{{ url('/logsort') }}" method="get">
             @csrf
-            <p>表示件数：<input type="number" name="dispnum" id="dispnum" value={{ $dispnum }} min="1" pattern="^[1-9]+$">
-                        <input type="hidden" name="sorton" value={{ $sort }}>
-                        <input type="hidden" name="category" value={{ $category }}>
+            <p>表示件数：<input type="number" name="dispnum3" id="dispnum" value="10" min="1" pattern="^[1-9]+$">
                         <input type="submit" name="submit" value="変更">
             </p>
             </form>
@@ -34,45 +28,37 @@
     </div>
     </x-slot>
 
-<form action="{{ url('/log') }}" method="get">
+<form action="{{ url('/logsort') }}" method="get">
 @csrf
 <table class="log">
     <thead>
     <tr><th>アクセスタイム<br>
         <input type="submit" name="sortaccess_time" value="▲">
         <input type="submit" name="sortaccess_time" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>ログインＩＤ<br>
         <input type="submit" name="sortid" value="▲">
         <input type="submit" name="sortid" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>IPアドレス<br>
         <input type="submit" name="sortip" value="▲">
         <input type="submit" name="sortip" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>ユーザーエージェント<br>
         <input type="submit" name="sortagent" value="▲">
         <input type="submit" name="sortagent" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>　　
-        <button type="button" class="pop">全表示切替</button>
         </th>
         <th>セッションID<br>
         <input type="submit" name="sortsession" value="▲">
         <input type="submit" name="sortsession" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>アクセスURL<br>
         <input type="submit" name="sorturl" value="▲">
         <input type="submit" name="sorturl" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>実行操作<br>
         <input type="submit" name="sortoperation" value="▲">
         <input type="submit" name="sortoperation" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
     </tr>
     </thead>
@@ -83,8 +69,8 @@
         <td>{{ $log->access_time }}</td>
         <td>{{ $log->user_id }}</td>
         <td>{{ $log->ip_address }}</td>
-        <td class="part">{{ Str::limit($log->user_agent, 50, '...') }}</td>
-        <td class="full" style="display:none" nowrap>{{ $log->user_agent }}</td>
+        <td>{{ Str::limit($log->user_agent, 50, '...') }}
+            <button type="button" value="{{ $log->user_agent }}" onclick="fullfunc(this.value)">全表示</button></td>
         <td>{{ $log->session_id }}</td>
         <td>{{ $log->access_url }}</td>
         <td>{{ $log->operation }}</td>
@@ -92,9 +78,25 @@
     @endforeach
     </tbody>
 </table>
-<div class="pager">
-<ul class="pagination" id="pagination">{{ $logger->appends(request()->query())->links('pagination::bootstrap-4') }}</ul>
-</div>
+<br>
+
+<ul class="pagination" id="pager">
+    <li class="getPageClass">
+    @for ($i = 0; $i <= $logger->lastPage(); $i++)
+    @if ($i == 0)
+    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc3({{ $i }})">◁</a>
+    @endif
+    @if ($i >= 1)
+    @if ($i == $logger->currentPage())
+    <a class="page-link current{{ $i }} active" onclick="pagefunc3({{ $i }})">{{ $i }}</a>
+    @else
+    <a class="page-link current{{ $i }}" onclick="pagefunc3({{ $i }})">{{ $i }}</a>
+    @endif
+    @endif
+    @endfor
+    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc3({{ $i }})">▷</a>
+    </li>
+</ul>
 
 
 {{-- 絞り込み検索ダイアログ --}}
@@ -105,7 +107,7 @@
         <dd class="data ">
         <select id="log_list" class="log_list" name="log_list" onchange="entryChange();">
             @foreach (Config::get('log_list.list') as $key => $val)
-                <option value="{{ $key }}">{{ $val }}</option>
+                <option id="listvalue" value="{{ $key }}">{{ $val }}</option>
             @endforeach
         </select>
         </dd>
@@ -122,33 +124,27 @@
         <dt class="select">時間(任意入力)</dt>
         <input id="firsttime" type="time" name="firsttime">～<input id="finaltime" type="time" name="finaltime">
     </dl>
-    <button type="button" id="log_display" class="originalhidden" onclick="return formCheck();">適用</button>
+    <button type="button" id="log_display" class="originalhidden">適用</button>
     <div id="logsearcherror2"></div>
 </div>
 
-{{-- 全表示ポップアップ
+{{-- 全表示ポップアップ --}}
 <div class="popup">
     <div class="content">
-        <p>{{ $log->user_id }}{{ $log->user_agent }}</p>
-        <button id="close">閉じる</button>
+        <p id="full"></p><br>
+        <button type="button" style="text-align:center" id="close">閉じる</button>
     </div>
-</div> --}}
+</div>
 
 <script type="text/javascript">
-    // $('.pop').on('click',function(){
-    //     $('.popup').addClass('show').fadeIn();
-    // });
+    function fullfunc(agent) {
+        $('#full').html(agent);
+        $('.popup').addClass('show').fadeIn();
+    }
 
-    // $('#close').on('click',function(){
-    //     $('.popup').fadeOut();
-    // });
-
-
-    $('.pop').on('click',function(){
-        $('.full').toggle();
-        $('.part').toggle();
+    $('#close').on('click',function(){
+        $('.popup').fadeOut();
     });
-
 
     function entryChange(){
     if(document.getElementById('log_list')){
@@ -165,86 +161,6 @@
     }
     window.onload = entryChange;
 
-
-    function formCheck(){
-    id = document.getElementById('log_list').value;
-    id2 = document.getElementById('word').value;
-    id3 = document.getElementById('firstday').value;
-    id4 = document.getElementById('finalday').value;
-
-    if(id === ""){
-        $("#logsearcherror").html('入力内容に不備があります。');
-        return false; // 送信中止
-    } else if (id !== "アクセスタイム") {
-        if (id2 === "") {
-            $("#logsearcherror").html('');
-            $("#logsearcherror2").html('入力内容に不備があります。');
-            $("#word").addClass('focus');
-            return false; // 送信中止
-        } else {
-            $("#word").removeClass('focus');
-            $("#logsearcherror2").html('');
-            return true; // 送信実行
-        }
-    } else if (id === "アクセスタイム") {
-        if  (id3 === "" && id4 === "") {
-            $("#logsearcherror").html('');
-            $("#logsearcherror2").html('入力内容に不備があります。');
-        } else if (id3 === "") {
-            $("#logsearcherror").html('');
-            $("#logsearcherror2").html('入力内容に不備があります。');
-            // $("#firstday").addClass('focus');
-            return false; // 送信中止
-        } else if (id4 === "") {
-            $("#logsearcherror").html('');
-            $("#logsearcherror2").html('入力内容に不備があります。');
-            // $("#finalday").addClass('focus');
-            // $("#firstday").removeClass('focus');
-            return false; // 送信中止
-        } else {
-            // $("#finalday").removeClass('focus');
-            $("#logsearcherror2").html('');
-            return true; // 送信実行
-        }
-    }
-    }
-
-
-
-    // }else if (id2 == "" && id3 == "" && id4 == "") {
-    //     $("#logsearcherror").html('');
-    //     $("#logsearcherror2").html('入力内容に不備があります。');
-    //     $("#word").addClass('focus');
-    //     $("#firstday").addClass('focus');
-    //     $("#finalday").addClass('focus');
-    //     return false; // 送信中止
-    // }else{
-    //     return true; // 送信実行
-    // }
-    // }
-
-
-    // function logsearchformcheck(str){
-    //     $("#logsearcherror p").remove();
-    //     var _result = true;
-    //     var _logsearchtextbox = $.trim(str);
-
-    //     if(_logsearchtextbox.match(/^[ 　\r\n\t]*$/)){ //空白やタブや改行
-    //         $("#logsearcherror").append("<p><i class=\"fa fa-exclamation-triangle\"></i>入力内容に不備があります。</p>");
-    //         $("#word").addClass('focus');
-    //         _result = false;
-    //     } else {
-    //         $("#word").removeClass('focus');
-    //     }
-    //     return _result;
-    // }
-
-
-
-
-
-
-
     $(function() {
         // 入力ダイアログを表示
         $("#logserch").click(function() {
@@ -256,7 +172,7 @@
         $('#firsttime').val("");
         $('#finaltime').val("");
         $('#logsearcherror').html("");
-
+        $('#logsearcherror2').html("");
         $("#log_get").dialog("open");
         return false;
         });
@@ -266,18 +182,78 @@
         autoOpen: false,
         modal: true,
         title:"絞り込み検索",
-        height: 450,
         width: 450,
+        height: 500,
         buttons: {
-        "キャンセル": function() {
-            $(this).dialog("close");
-        },
         "適用": function() {
             $('#log_display').click();
-            // $(this).dialog("close");
+        },
+        "キャンセル": function() {
+            $(this).dialog("close");
         },
         }
         });
     });
+
+    function pagefunc3(i) {
+        $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      url: '/log2',
+      type: 'get',
+      datatype: 'json',
+      data: {
+        'i': i
+      }
+    }).done(function (results) {
+        // console.log(results);
+        var rows = "";
+
+        if (results['searchlog'].length !== 0) {
+              for (var i = 0; i < results['searchlog'].length; i++) {
+                rows += `<tr><td>${ results['searchlog'][i].access_time }</td>`;
+            rows += `<td>${ results['searchlog'][i].user_id }</td>`;
+            rows += `<td>${ results['searchlog'][i].ip_address }</td>`;
+            rows += `<td>${ results['searchlog'][i].user_agent.substr(0, 50) + '...'}`;
+            rows += `<button type="button" value="${ results['searchlog'][i].user_agent }" onclick="fullfunc(this.value)">全表示</button></td>`;
+            rows += `<td>"${ results['searchlog'][i].session_id }</td>`;
+            rows += `<td>${ results['searchlog'][i].access_url }</td>`;
+            rows += `<td>${ results['searchlog'][i].operation }</td></tr>`;
+                $("#loglist").html(rows);
+              }
+        } else {
+            $("#loglist").html('<p>データがありません</p>');
+        }
+
+        var num = document.getElementsByClassName("page-link");
+        for (var i = 0; i < num.length; i++) {
+            if (num[i].innerText != results['pagenum']) {
+                $('.' + 'current' + i).removeClass('active');
+            } else {
+                $('.' + 'current' + i).addClass('active');
+            }
+        }
+
+        if (results['pagenum'] != 1) {
+            $('#prev').show();
+        } else {
+            $('#prev').hide();
+        }
+
+        var last = num.length - 2;
+        if (last == results['pagenum']) {
+            $('#next').hide();
+        } else {
+            $('#next').show();
+        }
+
+    }).fail(function () {
+      alert("エラーが発生しました");
+    });
+  };
 </script>
 </x-app-layout>

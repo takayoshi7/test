@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
 use App\Models\Emp;
+use App\Models\Dept;
 use App\Models\UserLog;
 
 class TestController extends Controller
@@ -20,84 +21,25 @@ class TestController extends Controller
     {
         $array = $req->array;
         $roles_name = $req->roles_name;
+        $ename = "";
+        $min = 0;
+        $max = 99999;
+        $dispnum = 5;
+        $sort = 'asc';
+        $category = "id";
+        $list1_page = 1;
+        $req->session()->put(['ename' => $ename, 'min' => $min, 'max' => $max, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'list1_page' => $list1_page]);
 
         //一次元配列の中に特定の値(1:顧客閲覧)があるか判定
         if (in_array(1, $array)) {
-            $dispnum = 5;
-            $sort = 'asc';
-
-            if ($req->category) {
-                $category = $req->category;
-            } else {
-                $category = 'id';
-            }
-
-
-            if ($req->sortid) {
-                $sort = $req->sortid;
-                $category = 'id';
-            }
-            if ($req->sortempno) {
-                $sort = $req->sortempno;
-                $category = 'empno';
-            }
-            if ($req->sortename) {
-                $sort = $req->sortename;
-                $category = 'ename';
-            }
-            if ($req->sortjob) {
-                $sort = $req->sortjob;
-                $category = 'job';
-            }
-            if ($req->sortmgr) {
-                $sort = $req->sortmgr;
-                $category = 'mgr';
-            }
-            if ($req->sorthiredate) {
-                $sort = $req->sorthiredate;
-                $category = 'hiredate';
-            }
-            if ($req->sortsal) {
-                $sort = $req->sortsal;
-                $category = 'sal';
-            }
-            if ($req->sortcomm) {
-                $sort = $req->sortcomm;
-                $category = 'comm';
-            }
-            if ($req->sortdeptno) {
-                $sort = $req->sortdeptno;
-                $category = 'deptno';
-            }
-
-
-            if ($sort === '▼') {
-                $sort = 'desc';
-                if ($req->dispnum) {
-                    $dispnum = $req->dispnum;
-                }
-            } else {
-                $sort = 'asc';
-                if ($req->dispnum) {
-                    $dispnum = $req->dispnum;
-                }
-            }
-
-            if ($req->sorton) {
-                $sort = $req->sorton;
-            }
-
-
-            // $members = DB::table('emp')->orderby($category, $sort)->paginate($dispnum);
-
-            $members = DB::table('emp')
-            ->select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
+            $members = Emp::
+            select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
             ->join('roles', 'emp.role', '=', 'roles.id')
-            ->orderby($category, $sort)->paginate($dispnum);
+            ->orderby('id', 'asc')->paginate(5);
 
             $droplist = DB::table('dept')->select('deptno', 'dname', 'sort')->orderby('sort', 'asc')->get();
 
-            $data = ['members' => $members, 'droplist' => $droplist, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array, 'roles_name' => $roles_name];
+            $data = ['members' => $members, 'droplist' => $droplist, 'array' => $array, 'roles_name' => $roles_name];
             return view('list1', $data);
         } else {
             return view('dashboard');
@@ -168,63 +110,28 @@ class TestController extends Controller
     public function list2(Request $req)
     {
         $array = $req->array;
+        $dname = "";
+        $dispnum2 = 3;
+        $sort2 = 'asc';
+        $category2 = "deptno";
+        $list2_page = 1;
+
+        $req->session()->put(['dname'=> $dname, 'dispnum2'=> $dispnum2, 'sort2'=> $sort2, 'category2'=> $category2, 'list2_page' => $list2_page]);
 
         if (in_array(3, $array)) {
-            $dispnum = 3;
-            $sort = 'asc';
+            $depte = Dept::orderby($category2, $sort2)->paginate($dispnum2);
 
-
-            if ($req->category) {
-                $category = $req->category;
-            } else {
-                $category = 'deptno';
-            }
-
-
-            if ($req->sortdeptno) {
-                $sort = $req->sortdeptno;
-                $category = 'deptno';
-            }
-            if ($req->sortdname) {
-                $sort = $req->sortdname;
-                $category = 'dname';
-            }
-            if ($req->sortloc) {
-                $sort = $req->sortloc;
-                $category = 'loc';
-            }
-            if ($req->sortnum) {
-                $sort = $req->sortnum;
-                $category = 'sort';
-            }
-
-
-            if ($sort === '▼') {
-                $sort = 'desc';
-                if ($req->dispnum) {
-                    $dispnum = $req->dispnum;
-                }
-            } else {
-                $sort = 'asc';
-                if ($req->dispnum) {
-                    $dispnum = $req->dispnum;
-                }
-            }
-
-            if ($req->sorton) {
-                $sort = $req->sorton;
-            }
-
-            $members = DB::table('dept')->orderby($category, $sort)->paginate($dispnum);
-
-            $num = $members->total();
-            if ($num <= $dispnum) {
+            $num = $depte->total();
+            if ($num <= $dispnum2) {
                 $listsortnum = "true";
             } else {
                 $listsortnum = "false";
             }
 
-            $data = ['depte' => $members, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category, 'array' => $array, 'listsortnum' => $listsortnum];
+            $numcount = $num + 1;
+            $req->session()->put('numcount', $numcount);
+
+            $data = ['depte' => $depte, 'array' => $array, 'listsortnum' => $listsortnum, 'numcount' => $numcount];
             return view('list2', $data);
 
         } else {
@@ -280,6 +187,10 @@ class TestController extends Controller
 
         if (in_array(4, $array)) {
             $deletedata = DB::table('dept')->where('deptno', $req->deptid)->delete();
+
+            $numcount = $req->session()->get('numcount') - 1;
+            $req->session()->put('numcount', $numcount);
+
             return response()->json($deletedata);
         } else {
             $data = ['alert_message' => '不正な通信です'];
@@ -294,23 +205,21 @@ class TestController extends Controller
         $ename = $req->ename;
         $minnum = $req->minnum;
         $maxnum = $req->maxnum;
-        $dispnum = $req->dispnum;
+        $dispnum = $req->session()->get('dispnum');
+        $category = $req->session()->get('category');
+        $sort = $req->session()->get('sort');
+        $list1_page = 1;
 
-        // $searchdata = DB::table('emp')->select('*')->where('ename', 'like', "%$req->ename%")
-        //                                            ->where('sal', '>=', $req->minnum)
-        //                                            ->where('sal', '<=', $req->maxnum)->get();
+        $req->session()->put(['ename' => $ename, 'min' => $minnum, 'max' => $maxnum, '$list1_page' => $list1_page]);
 
         $searchdata = Emp::
             select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
             ->join('roles', 'emp.role', '=', 'roles.id')
             ->where('ename', 'like', "%$ename%")
             ->where('sal', '>=', $minnum)
-            ->where('sal', '<=', $maxnum)->paginate($dispnum);
+            ->where('sal', '<=', $maxnum)->orderby($category, $sort)->paginate($dispnum);
 
-        $pager_link = $searchdata->appends(request()->query())->links();
-
-        $dataArray = ['pager_link' => $pager_link, 'searchdata' => $searchdata, 'array' => $array, 'roles_name' => $roles_name, 'ename' => $ename, 'minnum' => $minnum, 'maxnum' => $maxnum];
-        // $dataArray = ['searchdata' => $searchdata, 'array' => $array, 'roles_name' => $roles_name, 'ename' => $ename, 'minnum' => $minnum, 'maxnum' => $maxnum];
+        $dataArray = ['searchdata' => $searchdata, 'array' => $array, 'roles_name' => $roles_name];
         return response()->json($dataArray);
     }
 
@@ -318,32 +227,38 @@ class TestController extends Controller
     {
         $array = $req->array;
         $dname = $req->dname;
-        $dispnum = $req->dispnum;
+        $dispnum2 = $req->session()->get('dispnum2');
+        $category2 = $req->session()->get('category2');
+        $sort2 = $req->session()->get('sort2');
+        $list2_page = 1;
 
-        $searchdata = DB::table('dept')->select('*')->where('dname', 'like', "%$dname%")->paginate($dispnum);
+        $req->session()->put(['dname' => $dname, 'list2_page' => $list2_page]);
+
+        $searchdata = Dept::select('*')->where('dname', 'like', "%$dname%")->orderby($category2, $sort2)->paginate($dispnum2);
 
         $num = $searchdata->total();
-        if ($num <= $dispnum) {
+        if ($num <= $dispnum2) {
             $listsortnum = "true";
         } else {
             $listsortnum = "false";
         }
-    // $pager = DB::table('dept')->select('*')->where('dname', 'like', "%$req->dname%")->paginate(3);
-        // $pager_link = $pager->appends(request()->query())->links();
 
-        $dataArray = ['searchdata' => $searchdata, 'array' => $array, 'dname' => $dname, 'listsortnum' => $listsortnum];
+        $dataArray = ['searchdata' => $searchdata, 'array' => $array, 'listsortnum' => $listsortnum];
 
         return response()->json($dataArray);
     }
 
     public function empcsvd(Request $req) {
-        $data = $req->enames;
-        $min = $req->mins;
-        $max = $req->maxs;
+        $data = $req->session()->get('ename');
+        $min = $req->session()->get('min');
+        $max = $req->session()->get('max');
+        $category = $req->session()->get('category');
+        $sort = $req->session()->get('sort');
+
 
         if($data) {
             return response()->streamDownload(
-                function () use($data, $min, $max) {
+                function () use($data, $min, $max, $category, $sort) {
                     // 出力バッファをopen
                     $stream = fopen('php://output', 'w');
                     // 文字コードをShift-JISに変換
@@ -365,7 +280,7 @@ class TestController extends Controller
                 // データ
                 $csv =DB::table('emp')->select('*')->where('ename', 'like', '%'.$data.'%')
                                                    ->where('sal', '>=', $min)
-                                                   ->where('sal', '<=', $max)->get();
+                                                   ->where('sal', '<=', $max)->orderby($category, $sort)->get();
                 foreach ($csv as $emp) {
                     fputcsv($stream, [
                         $emp->id,
@@ -389,7 +304,7 @@ class TestController extends Controller
             );
         } else if ($min){
             return response()->streamDownload(
-                function () use($min, $max) {
+                function () use($min, $max, $category, $sort) {
                     // 出力バッファをopen
                     $stream = fopen('php://output', 'w');
                     // 文字コードをShift-JISに変換
@@ -409,7 +324,7 @@ class TestController extends Controller
                     'role',
                 ]);
                 // データ
-                $csv =DB::table('emp')->select('*')->where('sal', '>=', $min)->where('sal', '<=', $max)->get();
+                $csv =DB::table('emp')->select('*')->where('sal', '>=', $min)->where('sal', '<=', $max)->orderby($category, $sort)->get();
                 foreach ($csv as $emp) {
                     fputcsv($stream, [
                         $emp->id,
@@ -433,7 +348,7 @@ class TestController extends Controller
             );
         } else {
             return response()->streamDownload(
-                function () {
+                function () use($category, $sort) {
                     // 出力バッファをopen
                     $stream = fopen('php://output', 'w');
                     // 文字コードをShift-JISに変換
@@ -453,7 +368,7 @@ class TestController extends Controller
                         'role',
                     ]);
                     // データ
-                    $csv =DB::table('emp')->get();
+                    $csv =DB::table('emp')->orderby($category, $sort)->get();
                     foreach ($csv as $emp) {
                         fputcsv($stream, [
                             $emp->id,
@@ -682,11 +597,13 @@ class TestController extends Controller
     }
 
     public function deptcsvd(Request $req) {
-            $data = $req->dnames;
+        $data = $req->session()->get('dname');
+        $category2 = $req->session()->get('category2');
+        $sort2 = $req->session()->get('sort2');
 
     if($data) {
         return response()->streamDownload(
-            function () use($data) {
+            function () use($data, $category2, $sort2) {
                 // 出力バッファをopen
                 $stream = fopen('php://output', 'w');
                 // 文字コードをShift-JISに変換
@@ -700,7 +617,7 @@ class TestController extends Controller
                     'sort',
                 ]);
                 // データ
-                $csv =DB::table('dept')->select('*')->where('dname', 'like', '%'.$data.'%')->get();
+                $csv =DB::table('dept')->select('*')->where('dname', 'like', '%'.$data.'%')->orderby($category2, $sort2)->get();
                 foreach ($csv as $dept) {
                     fputcsv($stream, [
                         $dept->deptno,
@@ -718,7 +635,7 @@ class TestController extends Controller
         );
     } else {
         return response()->streamDownload(
-            function () {
+            function () use($category2, $sort2) {
                 // 出力バッファをopen
                 $stream = fopen('php://output', 'w');
                 // 文字コードをShift-JISに変換
@@ -732,7 +649,7 @@ class TestController extends Controller
                     'sort',
                 ]);
                 // データ
-                $csv =DB::table('dept')->get();
+                $csv =DB::table('dept')->orderby($category2, $sort2)->get();
                 foreach ($csv as $dept) {
                     fputcsv($stream, [
                         $dept->deptno,
@@ -983,108 +900,75 @@ class TestController extends Controller
 
     public function log(Request $req)
     {
-        $dispnum = 10;
-        $sort = 'desc';
+        $log_list = "";
+        $word = "";
+        $day1 = "";
+        $day2 = "";
+        $dispnum3 = 10;
+        $sort3 = 'desc';
+        $category3 = "access_time";
+        $list3_page = 1;
 
-        if (!$req->category) {
-            $category = 'access_time';
-        } else {
-            $category = $req->category;
-        }
+        $req->session()->put(['log_list'=> $log_list, 'word'=> $word, 'day1'=> $day1, 'day2'=> $day2, 'dispnum3'=> $dispnum3, 'sort3'=> $sort3, 'category3'=> $category3, 'list3_page'=> $list3_page]);
 
+        $logger = UserLog::select('*')
+                            ->orderby($category3, $sort3)->paginate($dispnum3);
 
-        if ($req->sortaccess_time) {
-            $sort = $req->sortaccess_time;
-            $category = 'access_time';
-        }
-        if ($req->sortid) {
-            $sort = $req->sortid;
-            $category = 'user_id';
-        }
-        if ($req->sortip) {
-            $sort = $req->sortip;
-            $category = 'ip_address';
-        }
-        if ($req->sortagent) {
-            $sort = $req->sortagent;
-            $category = 'user_agent';
-        }
-        if ($req->sortsession) {
-            $sort = $req->sortsession;
-            $category = 'session_id';
-        }
-        if ($req->sorturl) {
-            $sort = $req->sorturl;
-            $category = 'access_url';
-        }
-        if ($req->sortoperation) {
-            $sort = $req->sortoperation;
-            $category = 'operation';
-        }
-
-
-        if ($sort === '▲') {
-            $sort = 'asc';
-            if ($req->dispnum) {
-                $dispnum = $req->dispnum;
-            }
-        } else {
-            $sort = 'desc';
-            if ($req->dispnum) {
-                $dispnum = $req->dispnum;
-            }
-        }
-
-        if ($req->sorton) {
-            $sort = $req->sorton;
-        }
-
-        $logger = UserLog::select('user_id', 'ip_address', 'user_agent', 'session_id', 'access_url', 'operation', 'access_time')
-                            ->orderby($category, $sort)->paginate($dispnum);
-
-        $data = ['logger' => $logger, 'dispnum' => $dispnum, 'sort' => $sort, 'category' => $category];
+        $data = ['logger' => $logger];
         return view('log', $data);
     }
 
     public function logserch(Request $req)
     {
-        $val = $req->val;
+        $log_list = $req->log_list;
         $word = $req->word;
         $day1 = $req->day1;
         $day2 = $req->day2;
-        $dispnum = $req->dispnum;
+        $dispnum3 = $req->session()->get('dispnum3');
+        $sort3 = $req->session()->get('sort3');
+        $category3 = $req->session()->get('category3');
+        $list3_page = 1;
+        $req->session()->put('list3_page', $list3_page);
 
         if (!empty($word)) {
-            // $searchlog = UserLog::select(
-            //     'user_id', 'ip_address', 'user_agent', 'session_id',
-            //     'access_url', 'operation', 'access_time')
-            //     ->where($val, 'like', "%$word%")->orderby('access_time', 'desc')->get();
-            $searchlog = UserLog::select(
-                'user_id', 'ip_address', 'user_agent', 'session_id',
-                'access_url', 'operation', 'access_time')
-                ->where($val, 'like', "%$word%")->orderby('access_time', 'desc')->paginate($dispnum);
-            $pager_link = $searchlog->appends(request()->query())->links();
-            $dataArray = ['searchlog' => $searchlog, 'val' => $val, 'word' => $word, 'day1' => $day1, 'day2' => $day2];
-            // $dataArray = [$searchlog];
+            $req->session()->put('log_list', $log_list);
+            $req->session()->put('word', $word);
+            $req->session()->forget('day1');
+            $req->session()->forget('day2');
+
+            $searchlog = UserLog::select('*')
+                            ->where($log_list, 'like', "%$word%")->orderby($category3, $sort3)->paginate($dispnum3);
+
+            $dataArray = ['searchlog' => $searchlog];
+
             return response()->json($dataArray);
         } else {
-            $searchlog = DB::table('user_logs')->select('*')
-                                               ->where('access_time', '>=', $day1)
-                                               ->where('access_time', '<=', $day2)->paginate($dispnum);
-                $dataArray = ['searchlog' => $searchlog, 'val' => $val, 'word' => $word, 'day1' => $day1, 'day2' => $day2];
+            $req->session()->put('log_list', $log_list);
+            $req->session()->put('day1', $day1);
+            $req->session()->put('day2', $day2);
+            $req->session()->forget('word');
+
+            $searchlog = UserLog::select('*')
+                            ->where('access_time', '>=', $day1)
+                            ->where('access_time', '<=', $day2)->orderby($category3, $sort3)->paginate($dispnum3);
+
+                $dataArray = ['searchlog' => $searchlog];
+
             return response()->json($dataArray);
         }
     }
 
     public function logcsvd(Request $req) {
-        $log_list = $req->log_list;
-        $word = $req->word;
-        $day1 = $req->day1;
-        $day2 = $req->day2;
+        $log_list = $req->session()->get('log_list');
+        $word = $req->session()->get('word');
+        $day1 = $req->session()->get('day1');
+        $day2 = $req->session()->get('day2');
+        $sort3 = $req->session()->get('sort3');
+        $category3 = $req->session()->get('category3');
 
         if($log_list === 'access_time') {
         return response()->streamDownload(
-            function () use($day1, $day2) {
+            function () use($day1, $day2, $sort3, $category3) {
                 // 出力バッファをopen
                 $stream = fopen('php://output', 'w');
                 // 文字コードをShift-JISに変換
@@ -1102,7 +986,8 @@ class TestController extends Controller
                 ]);
                 // データ
                 $csv =DB::table('user_logs')->select('*')->where('access_time', '>=', $day1)
-                                                         ->where('access_time', '<=', $day2)->get();
+                                                         ->where('access_time', '<=', $day2)
+                                                         ->orderby($category3, $sort3)->get();
                 foreach ($csv as $log) {
                     fputcsv($stream, [
                         $log->access_time,
@@ -1128,7 +1013,7 @@ class TestController extends Controller
             }
 
         return response()->streamDownload(
-            function () use($log_list, $word) {
+            function () use($log_list, $word, $sort3, $category3) {
                 // 出力バッファをopen
                 $stream = fopen('php://output', 'w');
                 // 文字コードをShift-JISに変換
@@ -1145,7 +1030,8 @@ class TestController extends Controller
                     'operation',
                 ]);
                 // データ
-                $csv =DB::table('user_logs')->select('*')->where($log_list, 'like', '%'.$word.'%')->get();
+                $csv =DB::table('user_logs')->select('*')->where($log_list, 'like', '%'.$word.'%')
+                                                         ->orderby($category3, $sort3)->get();
                 foreach ($csv as $log) {
                     fputcsv($stream, [
                         $log->access_time,
@@ -1341,24 +1227,484 @@ class TestController extends Controller
         return response()->json($data);
     }
 
+    public function list11(Request $req)
+    {
+        $array = $req->array;
+        $roles_name = $req->roles_name;
+        $pagenum = $req->i;
+        $dispnum = $req->session()->get('dispnum');
+        $sort = $req->session()->get('sort');
+        $category = $req->session()->get('category');
+        $ename = $req->session()->get('ename');
+        $min = $req->session()->get('min');
+        $max = $req->session()->get('max');
+        $list1_page = $req->session()->get('list1_page');
+
+        $count = Emp::
+        select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
+        ->join('roles', 'emp.role', '=', 'roles.id')
+        ->where('ename', 'like', "%$ename%")
+        ->where('sal', '>=', $min)
+        ->where('sal', '<=', $max)
+        ->orderby($category, $sort)->count();
+
+        $lastpage = ceil($count / $dispnum);
+        $check2 = $lastpage + 1;
+
+
+        if ($pagenum == 0) {
+            $check = $list1_page - 2;
+            $pagenum = $list1_page -1;
+            $req->session()->put('list1_page', $pagenum);
+        } else if($pagenum == $check2) {
+            $check = $list1_page;
+            $pagenum = $list1_page + 1;
+            $req->session()->put('list1_page', $pagenum);
+        } else {
+            $check = $pagenum - 1;
+            $req->session()->put('list1_page', $pagenum);
+        }
+
+        $skip = $dispnum * $check;
+
+        $members = Emp::
+            select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->where('ename', 'like', "%$ename%")
+            ->where('sal', '>=', $min)
+            ->where('sal', '<=', $max)
+            ->orderby($category, $sort)->offset($skip)->limit($dispnum)->get();
+
+        $dataArray = ['members' => $members, 'array' => $array, 'roles_name' => $roles_name, 'pagenum' => $pagenum];
+
+        return response()->json($dataArray);
+    }
+
+    public function list100(Request $req)
+    {
+        $array = $req->array;
+        $roles_name = $req->roles_name;
+        $ename = $req->session()->get('ename');
+        $min = $req->session()->get('min');
+        $max = $req->session()->get('max');
+        $category = $req->session()->get('category');
+        $sort = $req->session()->get('sort');
+        $list1_page = 1;
+
+        if ($req->sortid) {
+            $sort = $req->sortid;
+            $category = 'id';
+        }
+        if ($req->sortempno) {
+            $sort = $req->sortempno;
+            $category = 'empno';
+        }
+        if ($req->sortename) {
+            $sort = $req->sortename;
+            $category = 'ename';
+        }
+        if ($req->sortjob) {
+            $sort = $req->sortjob;
+            $category = 'job';
+        }
+        if ($req->sortmgr) {
+            $sort = $req->sortmgr;
+            $category = 'mgr';
+        }
+        if ($req->sorthiredate) {
+            $sort = $req->sorthiredate;
+            $category = 'hiredate';
+        }
+        if ($req->sortsal) {
+            $sort = $req->sortsal;
+            $category = 'sal';
+        }
+        if ($req->sortcomm) {
+            $sort = $req->sortcomm;
+            $category = 'comm';
+        }
+        if ($req->sortdeptno) {
+            $sort = $req->sortdeptno;
+            $category = 'deptno';
+        }
+
+
+        if ($sort === '▼') {
+            $sort = 'desc';
+            if ($req->dispnum) {
+                $dispnum = $req->dispnum;
+            } else {
+                $dispnum = $req->session()->get('dispnum');
+            }
+        } else if ($sort === '▲') {
+            $sort = 'asc';
+            if ($req->dispnum) {
+                $dispnum = $req->dispnum;
+            } else {
+                $dispnum = $req->session()->get('dispnum');
+            }
+        } else {
+            if ($req->dispnum) {
+                $dispnum = $req->dispnum;
+            } else {
+                $dispnum = $req->session()->get('dispnum');
+            }
+        }
+
+            $members = Emp::
+            select('emp.id', 'empno', 'ename', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'deptno', 'img1', 'img2', 'roles.name')
+            ->join('roles', 'emp.role', '=', 'roles.id')
+            ->where('ename', 'like', "%$ename%")
+            ->where('sal', '>=', $min)
+            ->where('sal', '<=', $max)->orderby($category, $sort)->paginate($dispnum);
+
+        $req->session()->put(['dispnum'=> $dispnum, 'sort' => $sort, 'category' => $category, 'list1_page' => $list1_page]);
+
+        $droplist = DB::table('dept')->select('deptno', 'dname', 'sort')->orderby('sort', 'asc')->get();
+
+        $data = ['members' => $members, 'droplist' => $droplist, 'array' => $array, 'roles_name' => $roles_name];
+        return view('list1', $data);
+    }
+
+    public function list22(Request $req)
+    {
+        $array = $req->array;
+        $pagenum = $req->i;
+        $dispnum2 = $req->session()->get('dispnum2');
+        $sort2 = $req->session()->get('sort2');
+        $category2 = $req->session()->get('category2');
+        $dname = $req->session()->get('dname');
+        $list2_page = $req->session()->get('list2_page');
+
+        $count = Dept::select('*')->where('dname', 'like', "%$dname%")
+                                    ->orderby($category2, $sort2)->count();
+
+        $lastpage = ceil($count / $dispnum2);
+        $check2 = $lastpage + 1;
+
+        if ($pagenum == 0) {
+            $check = $list2_page - 2;
+            $pagenum = $list2_page -1;
+            $req->session()->put('list2_page', $pagenum);
+        } else if($pagenum == $check2) {
+            $check = $list2_page;
+            $pagenum = $list2_page + 1;
+            $req->session()->put('list2_page', $pagenum);
+        } else {
+            $check = $pagenum - 1;
+            $req->session()->put('list2_page', $pagenum);
+        }
+
+        $skip = $dispnum2 * $check;
+
+        $depte = Dept::select('*')->where('dname', 'like', "%$dname%")
+                                    ->orderby($category2, $sort2)->offset($skip)->limit($dispnum2)->get();
+
+        $dataArray = ['depte' => $depte, 'array' => $array, 'pagenum' => $pagenum];
+
+        return response()->json($dataArray);
+    }
+
+    public function list200(Request $req)
+    {
+        $array = $req->array;
+        $dname = $req->session()->get('dname');
+        $category2 = $req->session()->get('category2');
+        $sort2 = $req->session()->get('sort2');
+        $numcount = $req->session()->get('numcount');
+        $list2_page = 1;
+
+        if ($req->sortdeptno) {
+            $sort2 = $req->sortdeptno;
+            $category2 = 'deptno';
+        }
+        if ($req->sortdname) {
+            $sort2 = $req->sortdname;
+            $category2 = 'dname';
+        }
+        if ($req->sortloc) {
+            $sort2 = $req->sortloc;
+            $category2 = 'loc';
+        }
+        if ($req->sortnum) {
+            $sort2 = $req->sortnum;
+            $category2 = 'sort';
+        }
+
+
+        if ($sort2 === '▼') {
+            $sort2 = 'desc';
+            if ($req->dispnum2) {
+                $dispnum2 = $req->dispnum2;
+            } else {
+                $dispnum2 = $req->session()->get('dispnum2');
+            }
+        } else if ($sort2 === '▲') {
+            $sort2 = 'asc';
+            if ($req->dispnum2) {
+                $dispnum2 = $req->dispnum2;
+            } else {
+                $dispnum2 = $req->session()->get('dispnum2');
+            }
+        } else {
+            if ($req->dispnum2) {
+                $dispnum2 = $req->dispnum2;
+            } else {
+                $dispnum2 = $req->session()->get('dispnum2');
+            }
+        }
+
+        $depte = Dept::select('*')->where('dname', 'like', "%$dname%")
+                                    ->orderby($category2, $sort2)->paginate($dispnum2);
+
+        $req->session()->put(['dispnum2'=> $dispnum2, 'sort2' => $sort2, 'category2' => $category2, 'list2_page' => $list2_page]);
+
+        $num = $depte->total();
+        if ($num <= $dispnum2) {
+            $listsortnum = "true";
+        } else {
+            $listsortnum = "false";
+        }
+
+        $data = ['depte' => $depte, 'array' => $array, 'listsortnum' => $listsortnum, 'numcount' => $numcount];
+        return view('list2', $data);
+    }
+
+    public function log2(Request $req)
+    {
+        $pagenum = $req->i;
+        $dispnum3 = $req->session()->get('dispnum3');
+        $sort3 = $req->session()->get('sort3');
+        $category3 = $req->session()->get('category3');
+        $log_list = $req->session()->get('log_list');
+        $word = $req->session()->get('word');
+        $day1 = $req->session()->get('day1');
+        $day2 = $req->session()->get('day2');
+        $list3_page = $req->session()->get('list3_page');
+
+        if (!empty($word)) {
+            $count = UserLog::select('*')
+                            ->where($log_list, 'like', "%$word%")
+                            ->orderby($category3, $sort3)->count();
+
+            $lastpage = ceil($count / $dispnum3);
+            $check2 = $lastpage + 1;
+
+            if ($pagenum == 0) {
+                $check = $list3_page - 2;
+                $pagenum = $list3_page -1;
+                $req->session()->put('list3_page', $pagenum);
+            } else if($pagenum == $check2) {
+                $check = $list3_page;
+                $pagenum = $list3_page + 1;
+                $req->session()->put('list3_page', $pagenum);
+            } else {
+                $check = $pagenum - 1;
+                $req->session()->put('list3_page', $pagenum);
+            }
+
+            $skip = $dispnum3 * $check;
+
+            $searchlog = UserLog::select('*')
+                            ->where($log_list, 'like', "%$word%")
+                            ->orderby($category3, $sort3)->offset($skip)->limit($dispnum3)->get();
+
+            $dataArray = ['searchlog' => $searchlog, 'pagenum' => $pagenum];
+
+            return response()->json($dataArray);
+        } else if ($log_list == 'access_time') {
+            $count = UserLog::select('*')
+                            ->where('access_time', '>=', $day1)
+                            ->where('access_time', '<=', $day2)
+                            ->orderby($category3, $sort3)->count();
+
+            $lastpage = ceil($count / $dispnum3);
+            $check2 = $lastpage + 1;
+
+            if ($pagenum == 0) {
+                $check = $list3_page - 2;
+                $pagenum = $list3_page -1;
+                $req->session()->put('list3_page', $pagenum);
+            } else if($pagenum == $check2) {
+                $check = $list3_page;
+                $pagenum = $list3_page + 1;
+                $req->session()->put('list3_page', $pagenum);
+            } else {
+                $check = $pagenum - 1;
+                $req->session()->put('list3_page', $pagenum);
+            }
+
+            $skip = $dispnum3 * $check;
+
+            $searchlog = UserLog::select('*')
+                            ->where('access_time', '>=', $day1)
+                            ->where('access_time', '<=', $day2)
+                            ->orderby($category3, $sort3)->offset($skip)->limit($dispnum3)->get();
+
+            $dataArray = ['searchlog' => $searchlog, 'pagenum' => $pagenum];
+
+            return response()->json($dataArray);
+        } else {
+            $count = UserLog::select('*')
+                            ->orderby($category3, $sort3)->count();
+
+            $lastpage = ceil($count / $dispnum3);
+            $check2 = $lastpage + 1;
+
+            if ($pagenum == 0) {
+                $check = $list3_page - 2;
+                $pagenum = $list3_page -1;
+                $req->session()->put('list3_page', $pagenum);
+            } else if($pagenum == $check2) {
+                $check = $list3_page;
+                $pagenum = $list3_page + 1;
+                $req->session()->put('list3_page', $pagenum);
+            } else {
+                $check = $pagenum - 1;
+                $req->session()->put('list3_page', $pagenum);
+            }
+
+            $skip = $dispnum3 * $check;
+
+            $searchlog = UserLog::select('*')
+                            ->orderby($category3, $sort3)->offset($skip)->limit($dispnum3)->get();
+
+            $dataArray = ['searchlog' => $searchlog, 'pagenum' => $pagenum];
+
+            return response()->json($dataArray);
+        }
+    }
+
+    public function logsort(Request $req)
+    {
+        $log_list = $req->session()->get('log_list');
+        $word = $req->session()->get('word');
+        $day1 = $req->session()->get('day1');
+        $day2 = $req->session()->get('day2');
+        $category3 = $req->session()->get('category3');
+        $sort3 = $req->session()->get('sort3');
+        $list3_page = 1;
+
+        if ($req->sortaccess_time) {
+            $sort3 = $req->sortaccess_time;
+            $category3 = 'access_time';
+        }
+        if ($req->sortid) {
+            $sort3 = $req->sortid;
+            $category3 = 'user_id';
+        }
+        if ($req->sortip) {
+            $sort3 = $req->sortip;
+            $category3 = 'ip_address';
+        }
+        if ($req->sortagent) {
+            $sort3 = $req->sortagent;
+            $category3 = 'user_agent';
+        }
+        if ($req->sortsession) {
+            $sort3 = $req->sortsession;
+            $category3 = 'session_id';
+        }
+        if ($req->sorturl) {
+            $sort3 = $req->sorturl;
+            $category3 = 'access_url';
+        }
+        if ($req->sortoperation) {
+            $sort3 = $req->sortoperation;
+            $category3 = 'operation';
+        }
+
+
+        if ($sort3 === '▲') {
+            $sort3 = 'asc';
+            if ($req->dispnum3) {
+                $dispnum3 = $req->dispnum3;
+            } else {
+                $dispnum3 = $req->session()->get('dispnum3');
+            }
+        } else if ($sort3 === '▼') {
+            $sort3 = 'desc';
+            if ($req->dispnum3) {
+                $dispnum3 = $req->dispnum3;
+            } else {
+                $dispnum3 = $req->session()->get('dispnum3');
+            }
+        } else {
+            if ($req->dispnum3) {
+                $dispnum3 = $req->dispnum3;
+            } else {
+                $dispnum3 = $req->session()->get('dispnum3');
+            }
+        }
+
+        if ($word) {
+            $logger = UserLog::select('*')
+                            ->where($log_list, 'like', "%$word%")->orderby($category3, $sort3)->paginate($dispnum3);
+
+            $req->session()->put(['dispnum3'=> $dispnum3, 'sort3' => $sort3, 'category3' => $category3, 'list3_page' => $list3_page]);
+
+            $data = ['logger' => $logger];
+
+            return view('log', $data);
+        } else if ($log_list == 'access_time') {
+            $logger = UserLog::select('*')
+                            ->where('access_time', '>=', $day1)
+                            ->where('access_time', '<=', $day2)->orderby($category3, $sort3)->paginate($dispnum3);
+
+            $req->session()->put(['dispnum3'=> $dispnum3, 'sort3' => $sort3, 'category3' => $category3, 'list3_page' => $list3_page]);
+
+            $data = ['logger' => $logger];
+
+            return view('log', $data);
+        } else {
+            $logger = UserLog::select('*')
+                            ->orderby($category3, $sort3)->paginate($dispnum3);
+
+            $req->session()->put(['dispnum3'=> $dispnum3, 'sort3' => $sort3, 'category3' => $category3, 'list3_page' => $list3_page]);
+
+            $data = ['logger' => $logger];
+
+            return view('log', $data);
+        }
+    }
+
+    // public function list2all(Request $req)
+    // {
+    //     $array = $req->array;
+    //     $numcount = $req->session()->get('numcount');
+
+    //     if (in_array(3, $array)) {
+    //         $depte = Dept::orderby('sort', 'asc')->paginate($numcount);
+
+    //         $num = $depte->total();
+    //         if ($num < $numcount) {
+    //             $listsortnum = "true";
+    //         } else {
+    //             $listsortnum = "false";
+    //         }
+
+    //         $req->session()->get('dispnum', $numcount);
+
+    //         $data = ['depte' => $depte, 'array' => $array, 'listsortnum' => $listsortnum, 'numcount' => $numcount];
+    //         return view('list2', $data);
+
+    //     } else {
+    //         return view('dashboard');
+    //     }
+    // }
+
+
 
 
 
 
     public function aaa(Request $req)
     {
-        $members = DB::table('dept')->orderby('deptno', 'asc')->paginate(5);
+        $members = Emp::
+            select('id', 'empno', 'ename')
+            ->where('empno', 1001)->get();
 
-        $searchlog = UserLog::select(
-            'user_id', 'ip_address', 'user_agent', 'session_id',
-            'access_url', 'operation', 'access_time')
-            ->orderby('access_time', 'desc')->paginate(10);
-
-        // $num =count($members['total']);
-
-        print_r($searchlog->total());
-        dd($searchlog);
-        // $user = Auth::user();
-        //  echo($user);
+        // dd($members);
+        return response()->json($members);
     }
 }

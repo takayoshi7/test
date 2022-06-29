@@ -38,7 +38,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'emp',
+            'provider' => 'users',
         ],
     ],
 
@@ -60,7 +60,7 @@ return [
     */
 
     'providers' => [
-        'emp' => [
+        'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\Emp::class,
         ],
@@ -87,7 +87,7 @@ return [
     */
 
     'passwords' => [
-        'emp' => [
+        'users' => [
             'provider' => 'emp',
             'table' => 'password_resets',
             'expire' => 60,

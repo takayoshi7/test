@@ -98,8 +98,8 @@
         <form method="POST">
         @csrf
         <input type="text" id="enameset" name="enameset">
-        <br><br>
-        <button type="button" id="ename">更新</button>
+        <br>
+        <button type="button" id="ename" class="originalhidden">更新</button>
         <br>
         <div id="enameerror"></div>
         </form>
@@ -109,8 +109,8 @@
         <form method="POST">
         @csrf
         <input type="text" class="resize3" id="emailset" name="emailset">
-        <br><br>
-        <button type="button" id="email">更新</button>
+        <br>
+        <button type="button" id="email2" class="originalhidden">更新</button>
         <br>
         <div id="emailerror"></div>
         </form>
@@ -133,6 +133,9 @@
         title:"メールアドレス変更",
         width: 400,
         buttons: {
+        "更新": function() {
+            $('#email2').click();
+        },
         "キャンセル": function() {
             $(this).dialog("close");
         },
@@ -155,6 +158,9 @@
         modal: true,
         title:"名前変更",
         buttons: {
+        "更新": function() {
+            $('#ename').click();
+        },
         "キャンセル": function() {
             $(this).dialog("close");
         },

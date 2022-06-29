@@ -17,23 +17,24 @@
             <input type="button" id="search2"  value="検索">
             <input type="submit" id="dep"  value="CSVエクスポート">
             <input type="button" id="btn3" value="CSVインポート">
-            <input type="hidden" name="dnames">
         </form>
         </div>
         <div class="sort">
+        {{-- <form action="{{ url('/list2all') }}" method="post"> --}}
+        {{-- @csrf --}}
             @if(in_array(2, $array))
             <input type="hidden" id="list-ids" name="list-ids">
             <input type="hidden" id="listsortnum" value={{ $listsortnum }}>
             <input type="button" id="sortnum" style="background-color:rgb(216, 252, 216)"; value="並び順更新"><br>
-            <font size="2" color="rgb(216, 252, 216)">※1ページに全件表示後、ドラッグドロップで入れ替え、クリック</font>
+            {{-- <input type="submit" id="alldisplay" style="background-color:#efd2ff"; value="全件表示"><br> --}}
+            <font size="2" color="rgb(216, 252, 216)">※1ページに全件表示後、各行をドラッグドロップで入れ替え、クリック</font>
             @endif
+        {{-- </form> --}}
         </div>
         <div class="page">
-            <form action="{{ url('/list2') }}" method="get">
+            <form action="{{ url('/list200') }}" method="get">
             @csrf
-            <p>表示件数：<input type="number" name="dispnum" id="dispnum" value={{ $dispnum }} min="1" pattern="^[1-9]+$">
-                        <input type="hidden" name="sorton" value={{ $sort }}>
-                        <input type="hidden" name="category" value={{ $category }}>
+            <p>表示件数：<input type="number" name="dispnum2" id="dispnum" value="3" min="1" pattern="^[1-9]+$">
                         <input type="submit" name="submit" value="変更">
             </p>
             </form>
@@ -41,29 +42,25 @@
     </div>
     </x-slot>
 
-<form action="{{ url('/list2') }}" method="get">
+<form action="{{ url('/list200') }}" method="get">
 @csrf
 <table>
     <thead>
     <tr><th>部署コード
         <input type="submit" name="sortdeptno" value="▲">
         <input type="submit" name="sortdeptno" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>部署名
         <input type="submit" name="sortdname" value="▲">
         <input type="submit" name="sortdname" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>場所
         <input type="submit" name="sortloc" value="▲">
         <input type="submit" name="sortloc" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         <th>並び順
         <input type="submit" name="sortnum" value="▲">
         <input type="submit" name="sortnum" value="▼">
-        <input type="hidden" name="dispnum" value={{ $dispnum }}>
         </th>
         @if(in_array(4, $array))
         <th>編集</th>
@@ -81,15 +78,31 @@
         <td>{{ $depts->sort }}</td>
         @if(in_array(4, $array))
         <td><button type="button" class="edit2" value="{{ $depts->deptno }}, {{ $depts->dname }}, {{ $depts->loc }}, {{ $depts->sort }}" onclick="edit2func(this.value)">編集</button></td>
-        <td><button type="button" class="delete2" value="{{ $depts->deptno }}">削除</button></td>
+        <td><button type="button" class="delete2" value="{{ $depts->deptno }}, {{ $depts->dname }}" onclick="delete2func(this.value)">削除</button></td>
         @endif
     </tr>
     @endforeach
     </tbody>
 </table>
-<div class="pager">
-{{ $depte->appends(request()->query())->links('pagination::bootstrap-4') }}
-</div>
+<br>
+
+<ul class="pagination" id="pager">
+    <li class="getPageClass">
+    @for ($i = 0; $i <= $depte->lastPage(); $i++)
+    @if ($i == 0)
+    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc2({{ $i }})">◁</a>
+    @endif
+    @if ($i >= 1)
+    @if ($i == $depte->currentPage())
+    <a class="page-link current{{ $i }} active" onclick="pagefunc2({{ $i }})">{{ $i }}</a>
+    @else
+    <a class="page-link current{{ $i }}" onclick="pagefunc2({{ $i }})">{{ $i }}</a>
+    @endif
+    @endif
+    @endfor
+    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc2({{ $i }})">▷</a>
+    </li>
+</ul>
 
 
 {{-- 追加ダイアログ --}}
@@ -102,7 +115,7 @@
         <td><input type="text" id="insdeptno" name="deptno" value="70" pattern="^[1-9][0-9]$" required></td>
         <td><input type="text" id="insdname" name="dname" value="工事部"  required></td>
         <td><input type="text" id="insloc" name="loc" value="北海道" required></td>
-        <td><input type="text" id="inssort" name="sort" value="100" pattern="^[1-9][0-9]+$" required></td>
+        <td><input type="text" id="inssort" name="sort" value={{ $numcount }} pattern="^[1-9][0-9]+$" required></td>
         @endif
     </tr>
     </table><br>
@@ -128,10 +141,19 @@
         <td><input type="text" style="text-align:center" id="dd1" value="80" pattern="^[1-9][0-9]$" required></td>
         <td><input type="text" style="text-align:center" id="dd2" value="工事部" required></td>
         <td><input type="text" style="text-align:center" id="dd3" value="大阪" required></td>
-        <td><input type="text" style="text-align:center" id="dd4" value="100" pattern="^[1-9][0-9]+$" required></td>
+        <td><input type="text" style="text-align:center" id="dd4" value={{ $numcount }} pattern="^[1-9][0-9]+$" required></td>
     </tr>
     </table><br>
     <button type="button" id="edit2btn" class="originalhidden">更新</button>
+</div>
+
+{{-- 削除ダイアログ --}}
+<div id="deletelist2">
+    <p>削除してよろしいでしょうか？</p><br>
+    <p>社員コード：<input id="delete_deptno" disabled></p>
+    <p>社員名：<input id="delete_dname" disabled></p>
+    <br>
+    <button type="button" id="delete2btn" class="originalhidden">変更</button>
 </div>
 
 {{-- 検索ダイアログ --}}
@@ -182,9 +204,7 @@
         buttons: {
         "追加": function() {
             $('#insert2btn').click();
-            $(this).dialog("close");
         },
-
         "キャンセル": function() {
             $(this).dialog("close");
         },
@@ -214,7 +234,33 @@
         buttons: {
         "更新": function() {
             $('#edit2btn').click();
+        },
+        "キャンセル": function() {
             $(this).dialog("close");
+        },
+        }
+        });
+    });
+
+    function delete2func(value) {
+        var deleteArray = value.split(",");
+        $('#delete_deptno').val(deleteArray[0]);
+        $('#delete_dname').val(deleteArray[1]);
+
+        $("#deletelist2").dialog("open");
+        return false;
+    }
+
+    $(function() {
+        $("#deletelist2").dialog({
+        autoOpen: false,
+        modal: true,
+        title:"削除",
+        width: 400,
+        height: 300,
+        buttons: {
+        "削除": function() {
+            $('#delete2btn').click();
         },
         "キャンセル": function() {
             $(this).dialog("close");
@@ -241,7 +287,6 @@
         buttons: {
         "検索": function() {
             $('#dsearchbtn').click();
-            $(this).dialog("close");
         },
         "キャンセル": function() {
             $(this).dialog("close");
@@ -284,5 +329,66 @@
             $("#list-ids").val(updateRows);
         }
     });
+
+    function pagefunc2(i) {
+        $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      url: '/list22',
+      type: 'get',
+      datatype: 'json',
+      data: {
+        'i': i
+      }
+    }).done(function (results) {
+        // console.log(results);
+        var rows = "";
+
+        for (var i = 0; i < results['depte'].length; i++) {
+        rows += "<tr><td>".concat(results['depte'][i].deptno, "</td>");
+        rows += "<td>".concat(results['depte'][i].dname, "</td>");
+        rows += "<td>".concat(results['depte'][i].loc, "</td>");
+        rows += "<td>".concat(results['depte'][i].sort, "</td>");
+
+        if (results['array'].includes(4)) {
+          rows += "<td><button type=\"button\" class=\"edit2\" value=\"".concat(results['depte'][i].deptno, ", ").concat(results['depte'][i].dname, ", ").concat(results['depte'][i].loc, ", ").concat(results['depte'][i].sort, "\" onclick=\"edit2func(this.value)\">\u7DE8\u96C6</button></td>");
+          rows += "<td><button type=\"button\" class=\"delete2\" value=\"".concat(results['depte'][i].deptno, ", ").concat(results['depte'][i].dname, "\" onclick=\"delete2func(this.value)\">\u524A\u9664</button></td>");
+        } else {
+          rows += "</tr>";
+        }
+      }
+        $("#list2").html(rows);
+
+        var num = document.getElementsByClassName("page-link");
+        for (var i = 0; i < num.length; i++) {
+            if (num[i].innerText != results['pagenum']) {
+                $('.' + 'current' + i).removeClass('active');
+            } else {
+                $('.' + 'current' + i).addClass('active');
+            }
+        }
+
+        if (results['pagenum'] != 1) {
+            $('#prev').show();
+        } else {
+            $('#prev').hide();
+        }
+
+        var last = num.length - 2;
+        if (last == results['pagenum']) {
+            $('#next').hide();
+        } else {
+            $('#next').show();
+        }
+
+    }).fail(function () {
+      alert("エラーが発生しました");
+    });
+  };
+
 </script>
 </x-app-layout>

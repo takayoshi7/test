@@ -1,3 +1,339 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.num {
+    width: 5em;
+}
+
+.pagination  {
+    display: flex;
+	justify-content: center;
+    list-style-type: none;
+}
+
+.page-link {
+    display: inline;
+}
+
+#active {
+    color: #ffffff;
+	background-color: #888af9;
+    pointer-events: none;
+}
+
+table {
+    table-layout: fixed;
+    border: ridge;
+}
+
+th {
+    white-space: nowrap;
+    text-align: center;
+    border-style: groove;
+    border: ridge;
+}
+
+td {
+    text-align: center;
+    border: ridge;
+    border-style: groove;
+}
+
+#dispnum {
+    width: 4em;
+}
+
+.originalhidden {
+    display: none;
+}
+
+input.resize{
+    width:150px;
+}
+
+input.resize2{
+    width:104px;
+}
+
+input.resize3{
+    width:300px;
+}
+
+.popup {
+    display: none;
+    height: 100vh;
+    width: 100%;
+    background: black;
+    opacity: 0.9;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.content{
+    background: rgb(197, 244, 190);
+    padding: 30px;
+    width: 50%;
+}
+
+.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.focus {
+    background: #FFCCFF;
+}
+
+div.abc {
+    width: 40%;
+    border: ridge;
+    margin: 0 auto;
+
+}
+
+div.nameclass {
+    width: 100%;
+    height: auto;
+    border-bottom: ridge;
+    text-align: center;
+    margin: 0 auto;
+    padding:1% 1%;
+}
+
+div.imgclass {
+    display: grid;
+    height: auto;
+    grid-template-columns: 50% 50%;
+    text-align: center;
+}
+
+div.imgArea {
+    width: 100%;
+    height: auto;
+    border: ridge;
+    margin: 0 auto;
+}
+
+.myimg {
+    margin: 0 auto;
+    width: 40%;
+}
+
+div.greeting {
+    text-align: center;
+}
+
+div.emailclass {
+    height: auto;
+    border-top: ridge;
+    border-bottom: ridge;
+    text-align: center;
+    margin: 0 auto;
+    padding:1% 1%;
+}
+
+div.addressclass {
+    height: auto;
+    margin: 0 auto;
+    padding: 1% 0 1% 20%;
+}
+
+div.telclass {
+    height: auto;
+    margin: 0 auto;
+    text-align: center;
+    padding:1% 1%;
+}
+
+div.err_zip {
+    color: red;
+}
+
+div.err_tel {
+    color: red;
+}
+
+#getaddress {
+    width: 50%;
+}
+
+#address2 {
+    width: 50%;
+}
+
+.img1 {
+    margin-top: 5px;
+}
+
+.img2 {
+    margin-top: 5px;
+}
+
+div.drop-zone1 {
+    border: double;
+    margin: 0 auto;
+    width: 70%;
+    height: auto;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    background-color: #ffffe0;
+}
+
+div.drop-zone2 {
+    border: double;
+    margin: 0 auto;
+    width: 70%;
+    height: auto;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    background-color: #ffffe0;
+}
+
+label.original {
+    background-color: rgb(218, 255, 250);
+    padding: 2px;
+    border-radius: 12px;
+    border: outset;
+}
+
+div.preview1 {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.preview2 {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.drop-zone1list {
+    border: double;
+    margin: 0 auto;
+    width: 150px;
+    height: 5rem;
+    margin-top: 5px;
+    background-color: #ffffe0;
+}
+
+div.drop-zone2list {
+    border: double;
+    margin: 0 auto;
+    width: 150px;
+    height: 5rem;
+    margin-top: 5px;
+    background-color: #ffffe0;
+}
+
+div.preview1list {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.preview2list {
+    margin-top: 10px;
+    width: 30%;
+    margin: 0 auto;
+}
+
+div.listimgArea {
+    display: flex;
+    flex-wrap: wrap;
+    width: fit-content;
+}
+
+div.list {
+    text-align: center;
+}
+
+.listmyimg {
+    margin: 0 auto;
+    width: 30%;
+}
+
+label.original2 {
+    background-color: rgb(218, 255, 250);
+    padding: 0px;
+    border-radius: 12px;
+    border: outset;
+}
+
+input[type=text] {
+    height:30px;
+}
+
+div#addressbutton {
+    text-align: center;
+    border-bottom: ridge;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.top {
+    margin: 0 auto;
+    text-align: center;
+    /* height: 5rem; */
+    /* padding: 1% 0 1% 0%; */
+
+}
+
+.wrap {
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:100%;
+    /* border: double; */
+
+}
+
+.title {
+    width:10%;
+    /* border: double; */
+
+}
+
+.insert {
+    width: 10%;
+    text-align: center;
+    /* border: double; */
+}
+
+.category {
+    width: 30%;
+    /* border: double; */
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.sort {
+    width:30%;
+    /* border: double; */
+}
+
+.page {
+    width:20%;
+    /* border: double; */
+    text-align: right;
+}
+
+strong {
+    color: #2563eb;
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+  border: 1px solid #333; /* 追加 */
+  background-color: #eee2f5; /* 追加 */
+  border-radius: 5px; /* 追加 */
+}

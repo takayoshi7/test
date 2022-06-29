@@ -28,12 +28,6 @@ class LoginToLog
      */
     public function handle(Login $event)
     {
-        // logger()->info($event->user);
-        // logger()->info($event->guard);
-        // logger()->info($event->remember);
-        // logger()->info(request()->ip());
-        // logger()->info(request()->userAgent());
-
         UserLog::create(
             [
                 'user_id' => $event->user->id,
