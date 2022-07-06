@@ -16,7 +16,7 @@
     display: inline;
 }
 
-#active {
+.active {
     color: #ffffff;
 	background-color: #888af9;
     pointer-events: none;
@@ -244,6 +244,8 @@ div.preview2list {
 div.listimgArea {
     display: flex;
     flex-wrap: wrap;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
     width: fit-content;
 }
 
@@ -328,7 +330,7 @@ table {
 strong {
     color: #2563eb;
 }
-
+/* 上書き用 */
 button,
 [type='button'],
 [type='reset'],
