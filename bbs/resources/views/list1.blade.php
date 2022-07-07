@@ -137,7 +137,7 @@
     <li class="getPageClass">
     @for ($i = 0; $i <= $members->lastPage(); $i++)
     @if ($i == 0)
-    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc({{ $i }})">◁</a>
+    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc({{ $i }})">&lt;&lt;</a>
     @endif
     @if ($i >= 1)
     @if ($i == $members->currentPage())
@@ -147,13 +147,14 @@
     @endif
     @endif
     @endfor
-    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc({{ $i }})">▷</a>
+    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc({{ $i }})">&gt;&gt;</a>
     </li>
 </ul>
 
 {{-- 追加ダイアログ --}}
 <div id="insertlist1">
     <p>新しく社員を追加できます。下記項目に入力後、追加ボタンを押してください。</p>
+    <p>注：初回ログイン時はユーザＩＤでログインしてください。ログイン後、メールアドレスを登録し、ログイン画面にてパスワード変更をお願いします。</p>
     <font size="2">例.</font>
     <table>
         <tr>
@@ -591,7 +592,7 @@
         if (results['members'][i].img1) {
           rows += "<td><img class=\"listmyimg\" src=\"data:image/png;base64,".concat(results['members'][i].img1, "\" width=\"30px\">");
         } else {
-          rows += "<td><img class=\"listmyimg\" src=\"storage/img/no_image.jpg\" width=\"30px\">";
+          rows += "<td><img class=\"listmyimg\" src=\"/storage/img/no_image.jpg\" width=\"30px\">";
         }
 
         if (results['array'].includes(2)) {
@@ -601,9 +602,9 @@
         }
 
         if (results['members'][i].img2) {
-          rows += "<td><img class=\"listmyimg\" src=\"storage/img/".concat(results['members'][i].img2, "\" width=\"30px\">");
+          rows += "<td><img class=\"listmyimg\" src=\"/storage/img/".concat(results['members'][i].img2, "\" width=\"30px\">");
         } else {
-          rows += "<td><img class=\"listmyimg\" src=\"storage/img/no_image.jpg\" width=\"30px\">";
+          rows += "<td><img class=\"listmyimg\" src=\"/storage/img/no_image.jpg\" width=\"30px\">";
         }
 
         if (results['array'].includes(2)) {

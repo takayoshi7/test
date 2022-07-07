@@ -5249,7 +5249,7 @@ $(function () {
         if (results['searchdata']['data'][i].img1) {
           rows += "<td><img class=\"listmyimg\" src=\"data:image/png;base64,".concat(results['searchdata']['data'][i].img1, "\" width=\"30px\">");
         } else {
-          rows += "<td><img class=\"listmyimg\" src=\"storage/img/no_image.jpg\" width=\"30px\">";
+          rows += "<td><img class=\"listmyimg\" src=\"/storage/img/no_image.jpg\" width=\"30px\">";
         }
 
         if (results['array'].includes(2)) {
@@ -5259,9 +5259,9 @@ $(function () {
         }
 
         if (results['searchdata']['data'][i].img2) {
-          rows += "<td><img class=\"listmyimg\" src=\"storage/img/".concat(results['searchdata']['data'][i].img2, "\" width=\"30px\">");
+          rows += "<td><img class=\"listmyimg\" src=\"/storage/img/".concat(results['searchdata']['data'][i].img2, "\" width=\"30px\">");
         } else {
-          rows += "<td><img class=\"listmyimg\" src=\"storage/img/no_image.jpg\" width=\"30px\">";
+          rows += "<td><img class=\"listmyimg\" src=\"/storage/img/no_image.jpg\" width=\"30px\">";
         }
 
         if (results['array'].includes(2)) {
@@ -5288,7 +5288,7 @@ $(function () {
         page += `<li class="getPageClass">`;
         for (var i = 0; i <= results['searchdata']['last_page']; i++) {
             if (i == 0) {
-                page += `<a class="page-link current${ i }" id="prev" onclick="pagefunc(${ i })" style="display: none;">◁</a>`;
+                page += `<a class="page-link current${ i }" id="prev" onclick="pagefunc(${ i })" style="display: none;">&lt;&lt;</a>`;
             }
             if (i >= 1) {
                 if (i == results['searchdata']['current_page']) {
@@ -5299,7 +5299,7 @@ $(function () {
             }
         }
         if (results['searchdata']['current_page'] != results['searchdata']['last_page']) {
-            page += `<a class="page-link current${ i }" id="next" onclick="pagefunc(${ i })" style="display: inline;">▷</a>`;
+            page += `<a class="page-link current${ i }" id="next" onclick="pagefunc(${ i })" style="display: inline;">&gt;&gt;</a>`;
         }
         page += `</li>`;
 
@@ -5443,7 +5443,7 @@ $(function () {
         page += `<li class="getPageClass">`;
         for (var i = 0; i <= results['searchdata']['last_page']; i++) {
             if (i == 0) {
-                page += `<a class="page-link current${ i }" id="prev" onclick="pagefunc2(${ i })" style="display: none;">◁</a>`;
+                page += `<a class="page-link current${ i }" id="prev" onclick="pagefunc2(${ i })" style="display: none;">&lt;&lt;</a>`;
             }
             if (i >= 1) {
                 if (i == results['searchdata']['current_page']) {
@@ -5454,7 +5454,7 @@ $(function () {
             }
         }
         if (results['searchdata']['current_page'] != results['searchdata']['last_page']) {
-            page += `<a class="page-link current${ i }" id="next" onclick="pagefunc2(${ i })" style="display: inline;">▷</a>`;
+            page += `<a class="page-link current${ i }" id="next" onclick="pagefunc2(${ i })" style="display: inline;">&gt;&gt;</a>`;
         }
         page += `</li>`;
 
@@ -5784,7 +5784,7 @@ $(function () {
         page += `<li class="getPageClass">`;
         for (var i = 0; i <= results['searchlog']['last_page']; i++) {
             if (i == 0) {
-                page += `<a class="page-link current${ i }" id="prev" onclick="pagefunc3(${ i })" style="display: none;">◁</a>`;
+                page += `<a class="page-link current${ i }" id="prev" onclick="pagefunc3(${ i })" style="display: none;">&lt;&lt;</a>`;
             }
             if (i >= 1) {
                 if (i == results['searchlog']['current_page']) {
@@ -5795,7 +5795,7 @@ $(function () {
             }
         }
         if (results['searchlog']['current_page'] != results['searchlog']['last_page']) {
-            page += `<a class="page-link current${ i }" id="next" onclick="pagefunc3(${ i })" style="display: inline;">▷</a>`;
+            page += `<a class="page-link current${ i }" id="next" onclick="pagefunc3(${ i })" style="display: inline;">&gt;&gt;</a>`;
         }
         page += `</li>`;
 
@@ -6163,11 +6163,6 @@ $(function () {
       $("#err_tel").append("<p><i class=\"fa fa-exclamation-triangle\"></i>電話番号を入力してください。</p>");
     }
   });
-
-
-
-
-
 
 });
 

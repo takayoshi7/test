@@ -84,7 +84,7 @@
     <li class="getPageClass">
     @for ($i = 0; $i <= $logger->lastPage(); $i++)
     @if ($i == 0)
-    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc3({{ $i }})">◁</a>
+    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc3({{ $i }})">&lt;&lt;</a>
     @endif
     @if ($i >= 1)
     @if ($i == $logger->currentPage())
@@ -94,7 +94,7 @@
     @endif
     @endif
     @endfor
-    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc3({{ $i }})">▷</a>
+    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc3({{ $i }})">&gt;&gt;</a>
     </li>
 </ul>
 

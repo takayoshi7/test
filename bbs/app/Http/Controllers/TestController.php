@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\Emp;
 use App\Models\Dept;
 use App\Models\UserLog;
+use Illuminate\Support\Facades\Hash;
 
 class TestController extends Controller
 {
@@ -78,6 +79,7 @@ class TestController extends Controller
 
             $insertdata = DB::table('emp')->insert([
                             'id' => $req->insid,
+                            'password' => Hash::make($req->insid),
                             'empno' => $req->insempno,
                             'ename' => $req->insename,
                             'job' => $req->insjob,

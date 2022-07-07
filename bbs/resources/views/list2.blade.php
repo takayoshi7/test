@@ -90,7 +90,7 @@
     <li class="getPageClass">
     @for ($i = 0; $i <= $depte->lastPage(); $i++)
     @if ($i == 0)
-    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc2({{ $i }})">◁</a>
+    <a class="page-link current{{ $i }}" id="prev" style="display: none;" onclick="pagefunc2({{ $i }})">&lt;&lt;</a>
     @endif
     @if ($i >= 1)
     @if ($i == $depte->currentPage())
@@ -100,7 +100,7 @@
     @endif
     @endif
     @endfor
-    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc2({{ $i }})">▷</a>
+    <a class="page-link" id="next" style="display: inline;" onclick="pagefunc2({{ $i }})">&gt;&gt;</a>
     </li>
 </ul>
 

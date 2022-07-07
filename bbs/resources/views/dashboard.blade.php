@@ -65,7 +65,11 @@
     </div>
 
     <div class="emailclass">
+        @if(!is_null(Auth::user()->email))
         <b>メールアドレス：<br>{{ Auth::user()->email }}</b><br>
+        @else
+        <p>未登録</p><br>
+        @endif
         <button type="button" id="editemail">変更</button>
     </div>
 
