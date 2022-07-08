@@ -94,7 +94,9 @@
     @endif
     @endif
     @endfor
+    @if ($logger->currentPage() != $logger->lastPage())
     <a class="page-link" id="next" style="display: inline;" onclick="pagefunc3({{ $i }})">&gt;&gt;</a>
+    @endif
     </li>
 </ul>
 
