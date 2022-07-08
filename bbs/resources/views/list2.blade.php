@@ -100,7 +100,9 @@
     @endif
     @endif
     @endfor
+    @if ($depte->currentPage() != $depte->lastPage())
     <a class="page-link" id="next" style="display: inline;" onclick="pagefunc2({{ $i }})">&gt;&gt;</a>
+    @endif
     </li>
 </ul>
 
