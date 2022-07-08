@@ -147,7 +147,9 @@
     @endif
     @endif
     @endfor
+    @if ($members->currentPage() != $members->lastPage())
     <a class="page-link" id="next" style="display: inline;" onclick="pagefunc({{ $i }})">&gt;&gt;</a>
+    @endif
     </li>
 </ul>
 
