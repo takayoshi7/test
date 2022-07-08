@@ -150,8 +150,8 @@
 {{-- 削除ダイアログ --}}
 <div id="deletelist2">
     <p>削除してよろしいでしょうか？</p><br>
-    <p>社員コード：<input id="delete_deptno" disabled></p>
-    <p>社員名：<input id="delete_dname" disabled></p>
+    <p>部署コード：<input id="delete_deptno" disabled></p>
+    <p>部署名：<input id="delete_dname" disabled></p>
     <br>
     <button type="button" id="delete2btn" class="originalhidden">変更</button>
 </div>
