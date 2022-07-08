@@ -5123,7 +5123,7 @@ $(function () {
         alert(data.alert_message);
       }
     }).fail(function (error) {
-      console.log(error.statusText);
+        alert("エラーが発生しました");
     });
   });
 
