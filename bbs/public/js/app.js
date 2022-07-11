@@ -5492,7 +5492,7 @@ $(function () {
         alert("インポートしました"); //CSVデータに問題なければインポート成功
         $("#app2").dialog("close");
       } else {
-        for (i = 0; i < Object.keys(results.valA).length; i++) {
+        for (var i = 0; i < Object.keys(results.valA).length; i++) {
           //CSVデータに問題があればエラー内容表示
           $("#error").append(results['valB'][i] + '行目の' + results['valA'][i] + 'は正しくありません<br>');
         }
@@ -5529,7 +5529,7 @@ $(function () {
         $("#app").dialog("close");
         window.location.reload();
       } else {
-        for (i = 0; i < Object.keys(results.valA).length; i++) {
+        for (var i = 0; i < Object.keys(results.valA).length; i++) {
           //CSVデータに問題があればエラー内容表示
           $("#error").append(results['valB'][i] + '行目の' + results['valA'][i] + 'は正しくありません<br>');
         }
